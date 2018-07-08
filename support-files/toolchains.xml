@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<toolchains
+	xmlns="http://maven.apache.org/TOOLCHAINS/1.1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/TOOLCHAINS/1.1.0 http://maven.apache.org/xsd/toolchains-1.1.0.xsd">
+	<toolchain>
+		<type>jdk</type>
+		<provides>
+			<version>1.6</version>
+			<vendor>oracle</vendor>
+		</provides>
+		<configuration>
+			<jdkHome>/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home</jdkHome>
+		</configuration>
+	</toolchain>
+	<toolchain>
+		<type>jdk</type>
+		<provides>
+			<version>1.7</version>
+			<vendor>oracle</vendor>
+		</provides>
+		<configuration>
+			<jdkHome>/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home</jdkHome>
+		</configuration>
+	</toolchain>
+	<toolchain>
+		<type>jdk</type>
+		<provides>
+			<version>1.8</version>
+			<vendor>oracle</vendor>
+		</provides>
+		<configuration>
+			<jdkHome>/Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk</jdkHome>
+		</configuration>
+	</toolchain>
+	<toolchain>
+		<type>jdk</type>
+		<provides>
+			<version>9</version>
+			<vendor>oracle</vendor>
+		</provides>
+		<configuration>
+			<jdkHome>/Library/Java/JavaVirtualMachines/jdk-9.0.4.jdk/Contents/Home</jdkHome>
+		</configuration>
+	</toolchain>
+</toolchains>
