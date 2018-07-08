@@ -14,23 +14,12 @@
  * the License.
  */
 
-package com.github.exabrial.checkpgpsignaturesplugin;
+package com.github.exabrial.checkpgpsignaturesplugin.interfaces;
 
-public class PGPKey {
-	public final String keyId;
-	public final byte[] keyData;
+import org.apache.maven.artifact.Artifact;
 
-	public PGPKey(final String keyId, final byte[] keyData) {
-		if (keyId == null || keyData == null) {
-			throw new RuntimeException("keyId and keyData must not be null");
-		} else {
-			this.keyId = keyId;
-			this.keyData = keyData;
-		}
-	}
+public interface KeyIdResolver {
 
-	@Override
-	public String toString() {
-		return "PGPKey [keyId=" + keyId + ", keyData.length=" + keyData.length + "]";
-	}
+	String resolveKeyIdFor(Artifact artifact);
+
 }

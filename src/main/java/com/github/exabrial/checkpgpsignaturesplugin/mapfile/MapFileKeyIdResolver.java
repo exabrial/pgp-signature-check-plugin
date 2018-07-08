@@ -37,7 +37,7 @@ import org.apache.maven.shared.artifact.filter.StrictPatternIncludesArtifactFilt
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.sisu.Nullable;
 
-import com.github.exabrial.checkpgpsignaturesplugin.KeyIdResolver;
+import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeyIdResolver;
 
 @Named
 @Singleton

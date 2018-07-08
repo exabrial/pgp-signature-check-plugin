@@ -31,8 +31,8 @@ import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.CommandLineUtils.StringStreamConsumer;
 import org.codehaus.plexus.util.cli.Commandline;
 
-import com.github.exabrial.checkpgpsignaturesplugin.KeyRetriever;
-import com.github.exabrial.checkpgpsignaturesplugin.PGPKey;
+import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeyRetriever;
+import com.github.exabrial.checkpgpsignaturesplugin.model.PGPKey;
 
 @Named
 @Singleton

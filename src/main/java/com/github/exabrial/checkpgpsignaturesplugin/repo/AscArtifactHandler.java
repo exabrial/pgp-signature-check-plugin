@@ -13,23 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * Copyright [2018] [Jonathan S. Fisher]
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- */
 
-package com.github.exabrial.checkpgpsignaturesplugin;
+package com.github.exabrial.checkpgpsignaturesplugin.repo;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
@@ -39,7 +24,7 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
  * PGP signature file.
  */
 public class AscArtifactHandler implements ArtifactHandler {
-    private ArtifactHandler wrappedHandler;
+    private final ArtifactHandler wrappedHandler;
 
     /**
      * Initializes a new ASC Artifact Handler for the provided artifact.
@@ -47,7 +32,7 @@ public class AscArtifactHandler implements ArtifactHandler {
      * @param targetArtifact
      *   The artifact for which a GPG signature artifact is desired.
      */
-    public AscArtifactHandler(Artifact targetArtifact) {
+    public AscArtifactHandler(final Artifact targetArtifact) {
       this(targetArtifact.getArtifactHandler());
     }
 
@@ -63,7 +48,7 @@ public class AscArtifactHandler implements ArtifactHandler {
      *   such that all information about the target artifact come from the
      *   provided handler, except for the file extension (".asc").
      */
-    public AscArtifactHandler(ArtifactHandler wrappedHandler) {
+    public AscArtifactHandler(final ArtifactHandler wrappedHandler) {
       this.wrappedHandler = wrappedHandler;
     }
 

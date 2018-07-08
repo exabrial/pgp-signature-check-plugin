@@ -14,14 +14,14 @@
  * the License.
  */
 
-package com.github.exabrial.checkpgpsignaturesplugin;
+package com.github.exabrial.checkpgpsignaturesplugin.interfaces;
 
-import java.io.File;
+import java.util.Set;
 
-public interface KeysCache {
+import org.apache.maven.artifact.Artifact;
 
-	File getKeyLocation(String requiredKeyId);
+public interface DependenciesLocator {
 
-	File put(PGPKey pgpKey);
+	Set<Artifact> getArtifactsToVerify();
 
 }

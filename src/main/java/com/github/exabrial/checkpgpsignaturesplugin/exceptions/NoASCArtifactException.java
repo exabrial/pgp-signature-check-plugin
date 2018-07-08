@@ -14,12 +14,14 @@
  * the License.
  */
 
-package com.github.exabrial.checkpgpsignaturesplugin;
+package com.github.exabrial.checkpgpsignaturesplugin.exceptions;
 
-import java.io.File;
+import org.apache.maven.artifact.Artifact;
 
-public interface SignatureChecker {
+public class NoASCArtifactException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
 
-	void checkArtifact(File artifactFile, File signatureFile, File keyRingFile, String requiredKeyId);
-
+	public NoASCArtifactException(final Artifact artifact) {
+		super("Could not resolve signature artifact:" + artifact);
+	}
 }

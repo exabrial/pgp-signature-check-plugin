@@ -14,14 +14,12 @@
  * the License.
  */
 
-package com.github.exabrial.checkpgpsignaturesplugin.exceptions;
+package com.github.exabrial.checkpgpsignaturesplugin.interfaces;
 
 import org.apache.maven.artifact.Artifact;
 
-public class MissingKeyMapException extends RuntimeException {
-	private static final long serialVersionUID = 1L;
+public interface AscArtifactResolver {
 
-	public MissingKeyMapException(final Artifact artifact) {
-		super("There is no key mapped to:" + artifact);
-	}
+	Artifact resolveAscArtifact(Artifact artifact);
+
 }

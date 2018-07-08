@@ -26,6 +26,11 @@ import org.apache.maven.artifact.Artifact;
 import org.codehaus.plexus.logging.Logger;
 
 import com.github.exabrial.checkpgpsignaturesplugin.exceptions.MissingKeyMapException;
+import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeyIdResolver;
+import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeyRetriever;
+import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeysCache;
+import com.github.exabrial.checkpgpsignaturesplugin.interfaces.SignatureChecker;
+import com.github.exabrial.checkpgpsignaturesplugin.model.PGPKey;
 
 @Named
 @Singleton

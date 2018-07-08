@@ -33,8 +33,8 @@ import org.apache.maven.shared.repository.RepositoryManager;
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.sisu.Nullable;
 
-import com.github.exabrial.checkpgpsignaturesplugin.KeysCache;
-import com.github.exabrial.checkpgpsignaturesplugin.PGPKey;
+import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeysCache;
+import com.github.exabrial.checkpgpsignaturesplugin.model.PGPKey;
 
 @Named
 @Singleton

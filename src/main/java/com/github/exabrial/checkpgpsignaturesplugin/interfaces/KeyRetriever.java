@@ -14,7 +14,9 @@
  * the License.
  */
 
-package com.github.exabrial.checkpgpsignaturesplugin;
+package com.github.exabrial.checkpgpsignaturesplugin.interfaces;
+
+import com.github.exabrial.checkpgpsignaturesplugin.model.PGPKey;
 
 public interface KeyRetriever {
 

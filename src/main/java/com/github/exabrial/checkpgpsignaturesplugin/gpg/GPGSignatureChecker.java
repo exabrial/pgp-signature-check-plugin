@@ -30,7 +30,7 @@ import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.CommandLineUtils.StringStreamConsumer;
 import org.codehaus.plexus.util.cli.Commandline;
 
-import com.github.exabrial.checkpgpsignaturesplugin.SignatureChecker;
+import com.github.exabrial.checkpgpsignaturesplugin.interfaces.SignatureChecker;
 
 @Named
 @Singleton
