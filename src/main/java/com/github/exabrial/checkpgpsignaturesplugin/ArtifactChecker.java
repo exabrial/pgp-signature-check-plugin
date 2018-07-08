@@ -25,6 +25,8 @@ import javax.inject.Singleton;
 import org.apache.maven.artifact.Artifact;
 import org.codehaus.plexus.logging.Logger;
 
+import com.github.exabrial.checkpgpsignaturesplugin.exceptions.MissingKeyMapException;
+
 @Named
 @Singleton
 public class ArtifactChecker {
@@ -43,7 +45,7 @@ public class ArtifactChecker {
 		logger.debug("check() artifact:" + artifact);
 		final String keyId = pgpKeyIdResolver.resolveKeyIdFor(artifact);
 		if (keyId == null) {
-			throw new RuntimeException("There is no key mapped to:" + artifact);
+			throw new MissingKeyMapException(artifact);
 		} else {
 			File keyRing = pgpKeysCache.getKeyLocation(keyId);
 			if (keyRing == null) {
