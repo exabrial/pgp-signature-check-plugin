@@ -29,7 +29,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
 
-import com.github.exabrial.checkpgpsignaturesplugin.exceptions.NoASCArtifactException;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.AscArtifactResolver;
 
 @Named
@@ -52,11 +51,7 @@ public class RepositoryAscArtifactResolver implements AscArtifactResolver {
 		ascRequest.setArtifact(ascArtifact);
 		ascArtifact.setArtifactHandler(new AscArtifactHandler(ascArtifact));
 		final ArtifactResolutionResult ascResult = repositorySystem.resolve(ascRequest);
-		if (ascResult.isSuccess()) {
-			final Artifact ascResultArtifact = ascResult.getArtifacts().stream().findFirst().get();
-			return ascResultArtifact;
-		} else {
-			throw new NoASCArtifactException(artifact);
-		}
+		final Artifact ascResultArtifact = ascResult.getArtifacts().stream().findFirst().orElse(null);
+		return ascResultArtifact;
 	}
 }

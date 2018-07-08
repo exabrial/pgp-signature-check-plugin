@@ -30,11 +30,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import com.github.exabrial.checkpgpsignaturesplugin.exceptions.MissingKeyMapException;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeyIdResolver;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeyRetriever;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeysCache;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.SignatureChecker;
+import com.github.exabrial.checkpgpsignaturesplugin.model.MissingKeyMappingException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ArtifactCheckerTest {
@@ -68,7 +68,7 @@ public class ArtifactCheckerTest {
 		}
 	}
 
-	@Test(expected = MissingKeyMapException.class)
+	@Test(expected = MissingKeyMappingException.class)
 	public void testCheck_noMappedKey() {
 		artifactChecker.check(artifact, signature);
 	}

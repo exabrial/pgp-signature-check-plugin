@@ -34,7 +34,7 @@ import com.github.exabrial.checkpgpsignaturesplugin.interfaces.AscArtifactResolv
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.DependenciesLocator;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CheckPGPSignaturesMojoTest {
+public class CheckSignaturesMojoTest {
 	@InjectMocks
 	private CheckSignaturesMojo checkPGPSignaturesMojo;
 	@Mock

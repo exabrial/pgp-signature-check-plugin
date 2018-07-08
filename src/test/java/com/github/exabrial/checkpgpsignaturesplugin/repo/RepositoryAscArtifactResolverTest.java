@@ -17,6 +17,7 @@
 package com.github.exabrial.checkpgpsignaturesplugin.repo;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
@@ -36,8 +37,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import com.github.exabrial.checkpgpsignaturesplugin.exceptions.NoASCArtifactException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RepositoryAscArtifactResolverTest {
@@ -65,7 +64,6 @@ public class RepositoryAscArtifactResolverTest {
 
 	@Test
 	public void testResolveAscArtifact() {
-		when(ascResult.isSuccess()).thenReturn(true);
 		final HashSet<Artifact> artifacts = new HashSet<>();
 		final Artifact ascArtifact = mock(Artifact.class);
 		artifacts.add(ascArtifact);
@@ -73,9 +71,8 @@ public class RepositoryAscArtifactResolverTest {
 		assertEquals(ascArtifact, repositoryAscArtifactResolver.resolveAscArtifact(artifact));
 	}
 
-	@Test(expected = NoASCArtifactException.class)
+	@Test
 	public void testResolveAscArtifact_missingAsc() {
-		when(ascResult.isSuccess()).thenReturn(false);
-		repositoryAscArtifactResolver.resolveAscArtifact(artifact);
+		assertNull(repositoryAscArtifactResolver.resolveAscArtifact(artifact));
 	}
 }

@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.github.exabrial.checkpgpsignaturesplugin.exceptions;
+package com.github.exabrial.checkpgpsignaturesplugin.repo;
 
 import org.apache.maven.artifact.Artifact;
 

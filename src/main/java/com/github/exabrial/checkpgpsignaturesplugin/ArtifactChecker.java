@@ -25,11 +25,11 @@ import javax.inject.Singleton;
 import org.apache.maven.artifact.Artifact;
 import org.codehaus.plexus.logging.Logger;
 
-import com.github.exabrial.checkpgpsignaturesplugin.exceptions.MissingKeyMapException;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeyIdResolver;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeyRetriever;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeysCache;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.SignatureChecker;
+import com.github.exabrial.checkpgpsignaturesplugin.model.MissingKeyMappingException;
 import com.github.exabrial.checkpgpsignaturesplugin.model.PGPKey;
 
 @Named
@@ -50,7 +50,7 @@ public class ArtifactChecker {
 		logger.debug("check() artifact:" + artifact);
 		final String keyId = pgpKeyIdResolver.resolveKeyIdFor(artifact);
 		if (keyId == null) {
-			throw new MissingKeyMapException(artifact);
+			throw new MissingKeyMappingException(artifact);
 		} else {
 			File keyRing = pgpKeysCache.getKeyLocation(keyId);
 			if (keyRing == null) {
