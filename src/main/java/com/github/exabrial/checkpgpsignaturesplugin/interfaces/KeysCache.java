@@ -22,7 +22,7 @@ import com.github.exabrial.checkpgpsignaturesplugin.model.PGPKey;
 
 public interface KeysCache {
 
-	File getKeyLocation(String requiredKeyId);
+	File getKeyFile(String requiredKeyId);
 
 	File put(PGPKey pgpKey);
 

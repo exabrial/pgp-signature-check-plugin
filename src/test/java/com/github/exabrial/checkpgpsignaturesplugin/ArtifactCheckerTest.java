@@ -76,7 +76,7 @@ public class ArtifactCheckerTest {
 	@Test
 	public void testCheck_keyLocationNotNull() {
 		when(pgpKeyIdResolver.resolveKeyIdFor(artifact)).thenReturn(keyId);
-		when(pgpKeysCache.getKeyLocation(keyId)).thenReturn(mock(File.class));
+		when(pgpKeysCache.getKeyFile(keyId)).thenReturn(mock(File.class));
 
 		try {
 			artifactChecker.check(artifact, signature);

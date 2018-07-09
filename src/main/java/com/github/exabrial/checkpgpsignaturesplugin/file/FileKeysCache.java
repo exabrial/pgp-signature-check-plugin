@@ -19,12 +19,14 @@ package com.github.exabrial.checkpgpsignaturesplugin.file;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.maven.execution.MavenSession;
@@ -39,7 +41,7 @@ import com.github.exabrial.checkpgpsignaturesplugin.model.PGPKey;
 @Named
 @Singleton
 public class FileKeysCache implements KeysCache {
-	private final Map<String, File> keyCache = new HashMap<>();
+	private final Map<String, File> keyCache = Collections.synchronizedMap(new HashMap<>());
 	@Inject
 	private Logger logger;
 	@Inject
@@ -49,38 +51,44 @@ public class FileKeysCache implements KeysCache {
 	@Inject
 	@Nullable
 	@Named("${keyCacheDirectory}")
-	private String keyCacheDirectory;
+	private Provider<String> keyCacheDirectory;
+	private File keyCacheDirectoryFile;
 
 	@PostConstruct
 	public void postConstruct() {
-		if (keyCacheDirectory == null) {
+		if (keyCacheDirectory.get() == null) {
+			logger.debug("postConstruct() using keycache default directory");
 			final ProjectBuildingRequest projectBuildingRequest = mavenSession.getProjectBuildingRequest();
 			final File repoDirectory = repositoryManager.getLocalRepositoryBasedir(projectBuildingRequest);
 			final File m2Directory = repoDirectory.getParentFile();
-			keyCacheDirectory = m2Directory.getAbsolutePath() + File.separator + "artifactPubKeys";
-		}
-		final File keyCacheDirectoryFile = new File(keyCacheDirectory);
-		if (!keyCacheDirectoryFile.exists()) {
-			logger.info("postConstruct() creating keyCacheDirectory:" + keyCacheDirectory);
-			keyCacheDirectoryFile.mkdir();
+			keyCacheDirectoryFile = new File(m2Directory, "artifactPubKeys");
+			if (!keyCacheDirectoryFile.exists()) {
+				keyCacheDirectoryFile.mkdir();
+			}
 		} else {
-			logger.info("postConstruct() using existing keyCacheDirectory:" + keyCacheDirectory);
+			keyCacheDirectoryFile = new File(keyCacheDirectory.get());
+			if (!keyCacheDirectoryFile.exists()) {
+				throw new UserSpecifiedKeyCacheDirectoryDoesntExistException(keyCacheDirectoryFile);
+			} else {
+				logger.info("postConstruct() using existing keyCacheDirectory:" + keyCacheDirectoryFile.getAbsolutePath());
+			}
 		}
 	}
 
 	@Override
-	public File getKeyLocation(final String requiredKeyId) {
-		if (keyCache.containsKey(requiredKeyId)) {
-			logger.debug("getKeyLocation() cache hit requiredKeyId:" + requiredKeyId);
-			return keyCache.get(requiredKeyId);
+	public File getKeyFile(final String keyId) {
+		if (keyCache.containsKey(keyId)) {
+			logger.debug("getKeyLocation() cache hit keyId:" + keyId);
+			return keyCache.get(keyId);
 		} else {
-			final File keyFile = new File(keyCacheDirectory + File.separator + requiredKeyId + ".kbx");
+			final File keyFile = new File(keyCacheDirectoryFile, keyId + ".kbx");
 			if (keyFile.exists()) {
-				logger.debug("getKeyLocation() cache miss, but exists on disk requiredKeyId:" + requiredKeyId);
-				keyCache.put(requiredKeyId, keyFile);
+				logger.debug("getKeyLocation() cache miss, but exists on disk keyId:" + keyId);
+				keyCache.put(keyId, keyFile);
 				return keyFile;
 			} else {
-				logger.debug("getKeyLocation() cache miss, do not posess requiredKeyId:" + requiredKeyId);
+				keyCache.put(keyId, null);
+				logger.debug("getKeyLocation() cache miss, do not posess keyId:" + keyId);
 				return null;
 			}
 		}
@@ -89,12 +97,8 @@ public class FileKeysCache implements KeysCache {
 	@Override
 	public File put(final PGPKey pgpKey) {
 		logger.debug("put() writing to disk pgpKey:" + pgpKey);
-		final File keyFile = new File(keyCacheDirectory + File.separator + pgpKey.keyId + ".kbx");
+		final File keyFile = new File(keyCacheDirectoryFile, pgpKey.keyId + ".kbx");
 		try {
-			if (keyFile.exists()) {
-				logger.debug("put() deleting existing file");
-				keyFile.delete();
-			}
 			keyFile.createNewFile();
 			try (FileOutputStream fos = new FileOutputStream(keyFile)) {
 				logger.debug("put() writing data....");

@@ -52,7 +52,7 @@ public class ArtifactChecker {
 		if (keyId == null) {
 			throw new MissingKeyMappingException(artifact);
 		} else {
-			File keyRing = pgpKeysCache.getKeyLocation(keyId);
+			File keyRing = pgpKeysCache.getKeyFile(keyId);
 			if (keyRing == null) {
 				final PGPKey pgpKey = pgpKeyRetriever.retrieveKey(keyId);
 				keyRing = pgpKeysCache.put(pgpKey);
