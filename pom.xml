@@ -257,6 +257,7 @@
 					<excludes>
 						<exclude>*.md</exclude>
 						<exclude>support-files/*</exclude>
+						<exclude>CLs/*</exclude>
 					</excludes>
 				</configuration>
 				<executions>
@@ -645,6 +646,7 @@
 					<excludes>
 						<exclude>*.md</exclude>
 						<exclude>support-files/*</exclude>
+						<exclude>CLs/*</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
