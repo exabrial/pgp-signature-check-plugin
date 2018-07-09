@@ -408,6 +408,7 @@
 				<artifactId>maven-plugin-plugin</artifactId>
 				<configuration>
 					<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+					<goalPrefix>signature-check</goalPrefix>
 				</configuration>
 				<executions>
 					<execution>

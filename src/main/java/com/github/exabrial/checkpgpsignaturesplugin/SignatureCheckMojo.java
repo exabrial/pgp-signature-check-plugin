@@ -31,8 +31,8 @@ import org.codehaus.plexus.logging.Logger;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.AscArtifactResolver;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.DependenciesLocator;
 
-@Mojo(name = "check-signatures", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, requiresProject = true)
-public class CheckSignaturesMojo extends AbstractMojo {
+@Mojo(name = "signature-check", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, requiresProject = true)
+public class SignatureCheckMojo extends AbstractMojo {
 	@Inject
 	private ArtifactChecker artifactChecker;
 	@Inject
