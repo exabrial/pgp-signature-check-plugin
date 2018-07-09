@@ -19,6 +19,7 @@ package com.github.exabrial.checkpgpsignaturesplugin.gpg;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.codehaus.plexus.logging.Logger;
@@ -37,12 +38,13 @@ public class GPGExecutable {
 	@Inject
 	@Nullable
 	@Named("${gpgExecutable}")
+	private Provider<String> gpgExecutableProvider;
 	private String gpgExecutable;
 
 	@PostConstruct
 	public void postConstruct() {
 		final Commandline cmd = new Commandline();
-		if (gpgExecutable == null) {
+		if ((gpgExecutable = gpgExecutableProvider.get()) == null) {
 			try {
 				if (Os.isFamily(Os.FAMILY_WINDOWS)) {
 					cmd.setExecutable("where.exe");
