@@ -16,46 +16,41 @@
 
 package com.github.exabrial.checkpgpsignaturesplugin;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import java.util.Set;
 
-import java.util.HashSet;
+import javax.inject.Inject;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
 import org.codehaus.plexus.logging.Logger;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.AscArtifactResolver;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.DependenciesLocator;
 
-@RunWith(MockitoJUnitRunner.class)
-public class SignatureCheckMojoTest {
-	@InjectMocks
-	private SignatureCheckMojo signatureCheckMojo;
-	@Mock
+@Mojo(name = "pgp-signature-check", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, requiresProject = true)
+public class PGPSignatureCheckMojo extends AbstractMojo {
+	@Inject
 	private ArtifactChecker artifactChecker;
-	@Mock
+	@Inject
 	private AscArtifactResolver ascArtifactResolver;
-	@Mock
+	@Inject
 	private DependenciesLocator dependenciesLocator;
-	@Mock
+	@Inject
 	private Logger logger;
 
-	@Test
-	public void testExecute() throws Exception {
-		final HashSet<Artifact> artifacts = new HashSet<>();
-		final Artifact projectArtifact = mock(Artifact.class);
-		artifacts.add(projectArtifact);
-		when(dependenciesLocator.getArtifactsToVerify()).thenReturn(artifacts);
-		final Artifact ascArtifact = mock(Artifact.class);
-		when(ascArtifactResolver.resolveAscArtifact(projectArtifact)).thenReturn(ascArtifact);
-
-		signatureCheckMojo.execute();
-		verify(artifactChecker).check(projectArtifact, ascArtifact);
+	@Override
+	public void execute() throws MojoExecutionException, MojoFailureException {
+		logger.info("execute() checking artifact PGP signatures...");
+		try {
+			final Set<Artifact> filtered = dependenciesLocator.getArtifactsToVerify();
+			filtered.forEach(artifact -> artifactChecker.check(artifact, ascArtifactResolver.resolveAscArtifact(artifact)));
+		} catch (final Exception e) {
+			throw new MojoExecutionException(e.getMessage(), e);
+		}
+		logger.info("execute() checking artifact PGP signatures complete.");
 	}
 }

@@ -12,7 +12,9 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
- */ com.github.exabrial.checkpgpsignaturesplugin.file;
+ */
+
+package com.github.exabrial.checkpgpsignaturesplugin.file;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
