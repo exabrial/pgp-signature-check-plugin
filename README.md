@@ -17,11 +17,15 @@ You'll need Java8, a `~/.m2/toolchains.xml`[file](../master/support-files/toolch
 
 ## Usage
 
-Create an `artifact-key-map.txt` in your project root. See the example [here](../master/src/test/resources/artifact-key-map.txt)
+Create an `artifact-key-map.txt` in your project root. See the example [here](../master/src/test/resources/artifact-key-map.txt).
+
+Next add this to your build section:
 
 ```
 <build>
+...
 	<plugins>
+...
 		<plugin>
 			<groupId>com.github.exabrial</groupId>
 			<artifactId>pgp-signature-check-plugin</artifactId>
