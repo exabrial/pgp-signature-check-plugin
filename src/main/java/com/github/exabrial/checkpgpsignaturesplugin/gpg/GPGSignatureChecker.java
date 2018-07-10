@@ -33,12 +33,12 @@ import com.github.exabrial.checkpgpsignaturesplugin.model.SignatureCheckFailedEx
 @Named
 @Singleton
 public class GPGSignatureChecker implements SignatureChecker {
-	private static final Pattern signingKeyPattern = Pattern.compile("^gpg:\\s+using (ECDSA|RSA|DSA) key ([a-z0-9]{16,40})$",
+	private static final Pattern signingKeyPattern = Pattern.compile("^gpg:\\s+using (ECDSA|RSA|DSA) key ([a-f0-9]{16,40})$",
 			Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 	private static final Pattern usingSubkeyPattern = Pattern.compile("^gpg:\\s+using subkey.*$",
 			Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 	private static final Pattern subkeyPattern = Pattern.compile(
-			"^gpg:\\s+using subkey ([a-z0-9]{16,40}) instead of primary key ([a-z0-9]{16,40})$",
+			"^gpg:\\s+using subkey ([a-f0-9]{16,40}) instead of primary key ([a-f0-9]{16,40})$",
 			Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 	@Inject
 	private CommandExecutor commandExecutor;
