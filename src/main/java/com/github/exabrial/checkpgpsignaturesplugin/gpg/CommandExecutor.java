@@ -37,7 +37,7 @@ public class CommandExecutor {
 		final StringStreamConsumer consumer = new StringStreamConsumer();
 		try {
 			final int exitCode = CommandLineUtils.executeCommandLine(commandLine, consumer, consumer);
-			return new ExecutionResult(exitCode, consumer.getOutput());
+			return new ExecutionResult(exitCode, consumer.getOutput().trim());
 		} catch (final CommandLineException e) {
 			throw new RuntimeException(e);
 		}
