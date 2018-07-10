@@ -31,6 +31,7 @@ import org.codehaus.plexus.util.cli.CommandLineUtils.StringStreamConsumer;
 import org.codehaus.plexus.util.cli.Commandline;
 
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.SignatureChecker;
+import com.github.exabrial.checkpgpsignaturesplugin.model.SignatureCheckFailedException;
 
 @Named
 @Singleton
@@ -48,7 +49,8 @@ public class GPGSignatureChecker implements SignatureChecker {
 	private Logger logger;
 
 	@Override
-	public void checkArtifact(final File artifactFile, final File signatureFile, final File keyRingFile, final String requiredKeyId) {
+	public void checkArtifact(final File artifactFile, final File signatureFile, final File keyRingFile, final String requiredKeyId)
+			throws SignatureCheckFailedException {
 		final Commandline cmd = new Commandline();
 		cmd.setExecutable(gpgExecutable.getGPGExecutable());
 		cmd.createArg().setValue("--verbose");
@@ -63,8 +65,7 @@ public class GPGSignatureChecker implements SignatureChecker {
 			final StringStreamConsumer consumer = new StringStreamConsumer();
 			final int exitCode = CommandLineUtils.executeCommandLine(cmd, consumer, consumer);
 			if (exitCode != 0 || !isGoodOutput(consumer.getOutput(), requiredKeyId)) {
-				logger.error("checkArtifact() consumer.getOutput():" + consumer.getOutput());
-				throw new RuntimeException("Signature failure. GPG exited with code:" + exitCode);
+				throw new SignatureCheckFailedException(exitCode, consumer);
 			}
 		} catch (final CommandLineException e) {
 			throw new RuntimeException(e);

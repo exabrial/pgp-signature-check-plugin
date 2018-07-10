@@ -14,15 +14,14 @@
  * the License.
  */
 
-package com.github.exabrial.checkpgpsignaturesplugin.interfaces;
+package com.github.exabrial.checkpgpsignaturesplugin.model;
 
-import java.io.File;
+import org.codehaus.plexus.util.cli.CommandLineUtils.StringStreamConsumer;
 
-import com.github.exabrial.checkpgpsignaturesplugin.model.SignatureCheckFailedException;
+public class SignatureCheckFailedException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
 
-public interface SignatureChecker {
-
-	void checkArtifact(File artifactFile, File signatureFile, File keyRingFile, String requiredKeyId)
-			throws SignatureCheckFailedException;
-
+	public SignatureCheckFailedException(final int exitCode, final StringStreamConsumer consumer) {
+		super("Signature failure. GPG exited with code:" + exitCode + "\nconsumer.getOutput():\n" + consumer.getOutput());
+	}
 }
