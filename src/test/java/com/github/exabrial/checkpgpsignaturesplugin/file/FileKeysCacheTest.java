@@ -88,6 +88,21 @@ public class FileKeysCacheTest {
 	}
 
 	@Test
+	public void testPostConstruct_artifactPubKeysAlreadyExists() throws Exception {
+		when(keyCacheDirectory.get()).thenReturn(null);
+		final ProjectBuildingRequest projectBuildingRequest = mock(ProjectBuildingRequest.class);
+		when(mavenSession.getProjectBuildingRequest()).thenReturn(projectBuildingRequest);
+		final File repoDirectory = new File(parentDirectory, "repository");
+		repoDirectory.mkdir();
+		final File artifactPubKeys = new File(parentDirectory, "artifactPubKeys");
+		artifactPubKeys.mkdir();
+		assertTrue(artifactPubKeys.exists());
+		when(repositoryManager.getLocalRepositoryBasedir(projectBuildingRequest)).thenReturn(repoDirectory);
+		fileKeysCache.postConstruct();
+		assertTrue(new File(parentDirectory, "artifactPubKeys").exists());
+	}
+
+	@Test
 	public void testPostConstruct_specificDirExists() throws Exception {
 		fileKeysCache.postConstruct();
 		verify(logger).info("postConstruct() using existing keyCacheDirectory:" + parentDirectory.getAbsolutePath());

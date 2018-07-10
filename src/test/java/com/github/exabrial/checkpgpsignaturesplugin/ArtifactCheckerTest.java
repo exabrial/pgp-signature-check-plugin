@@ -16,7 +16,6 @@
 
 package com.github.exabrial.checkpgpsignaturesplugin;
 
-import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -25,6 +24,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.maven.artifact.Artifact;
 import org.codehaus.plexus.logging.Logger;
@@ -66,14 +66,7 @@ public class ArtifactCheckerTest {
 		when(pgpKeyIdResolver.resolveKeyIdFor(artifact)).thenReturn(keyId);
 		final PGPKey pgpKey = mock(PGPKey.class);
 		when(pgpKeyRetriever.retrieveKey(keyId)).thenReturn(pgpKey);
-
-		try {
-			artifactChecker.check(artifact, signature);
-		} catch (final Exception e) {
-			e.printStackTrace();
-			fail("failed with exception");
-		}
-
+		artifactChecker.check(artifact, signature);
 		verify(pgpKeysCache).getKeyFile(keyId);
 		verify(pgpKeyRetriever).retrieveKey(keyId);
 		verify(pgpKeysCache).put(pgpKey);
@@ -83,13 +76,7 @@ public class ArtifactCheckerTest {
 	public void testCheck_cacheHit() throws Exception {
 		when(pgpKeyIdResolver.resolveKeyIdFor(artifact)).thenReturn(keyId);
 		when(pgpKeysCache.getKeyFile(keyId)).thenReturn(mock(File.class));
-
-		try {
-			artifactChecker.check(artifact, signature);
-		} catch (final Exception e) {
-			e.printStackTrace();
-			fail("failed with exception");
-		}
+		artifactChecker.check(artifact, signature);
 		verify(pgpKeysCache).getKeyFile(keyId);
 		verify(pgpKeysCache, never()).put(any(PGPKey.class));
 		verifyZeroInteractions(pgpKeyRetriever);
@@ -97,6 +84,15 @@ public class ArtifactCheckerTest {
 
 	@Test(expected = MissingKeyMappingException.class)
 	public void testCheck_noMappedKey() {
+		artifactChecker.check(artifact, signature);
+	}
+
+	@Test(expected = RuntimeException.class)
+	public void testCheck_ioeOnPut() throws Exception {
+		when(pgpKeyIdResolver.resolveKeyIdFor(artifact)).thenReturn(keyId);
+		final PGPKey pgpKey = mock(PGPKey.class);
+		when(pgpKeyRetriever.retrieveKey(keyId)).thenReturn(pgpKey);
+		when(pgpKeysCache.put(pgpKey)).thenThrow(new IOException());
 		artifactChecker.check(artifact, signature);
 	}
 }
