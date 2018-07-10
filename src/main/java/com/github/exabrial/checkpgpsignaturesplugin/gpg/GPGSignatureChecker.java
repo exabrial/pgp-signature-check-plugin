@@ -35,8 +35,6 @@ import com.github.exabrial.checkpgpsignaturesplugin.model.SignatureCheckFailedEx
 public class GPGSignatureChecker implements SignatureChecker {
 	private static final Pattern signingKeyPattern = Pattern.compile("^gpg:\\s+using (ECDSA|RSA|DSA) key ([a-f0-9]{16,40})$",
 			Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
-	private static final Pattern usingSubkeyPattern = Pattern.compile("^gpg:\\s+using subkey.*$",
-			Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 	private static final Pattern subkeyPattern = Pattern.compile(
 			"^gpg:\\s+using subkey ([a-f0-9]{16,40}) instead of primary key ([a-f0-9]{16,40})$",
 			Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
@@ -72,9 +70,8 @@ public class GPGSignatureChecker implements SignatureChecker {
 			final Matcher signingKeyMatcher = signingKeyPattern.matcher(output);
 			if (signingKeyMatcher.find()) {
 				final String longSubKey = signingKeyMatcher.group(2);
-				if (usingSubkeyPattern.matcher(output).find()) {
-					final Matcher subkeyKeyMatcher = subkeyPattern.matcher(output);
-					subkeyKeyMatcher.find();
+				final Matcher subkeyKeyMatcher = subkeyPattern.matcher(output);
+				if (subkeyKeyMatcher.find()) {
 					final String shortSubKey = subkeyKeyMatcher.group(1);
 					final String shortMasterKey = subkeyKeyMatcher.group(2);
 					return requiredKeyId.endsWith(shortMasterKey) && longSubKey.endsWith(shortSubKey);
