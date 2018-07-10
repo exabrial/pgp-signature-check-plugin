@@ -95,17 +95,13 @@ public class FileKeysCache implements KeysCache {
 	}
 
 	@Override
-	public File put(final PGPKey pgpKey) {
+	public File put(final PGPKey pgpKey) throws IOException {
 		logger.debug("put() writing to disk pgpKey:" + pgpKey);
 		final File keyFile = new File(keyCacheDirectoryFile, pgpKey.keyId + ".kbx");
-		try {
-			keyFile.createNewFile();
-			try (FileOutputStream fos = new FileOutputStream(keyFile)) {
-				logger.debug("put() writing data....");
-				fos.write(pgpKey.keyData);
-			}
-		} catch (final IOException e) {
-			throw new RuntimeException(e);
+		keyFile.createNewFile();
+		try (FileOutputStream fos = new FileOutputStream(keyFile)) {
+			logger.debug("put() writing data....");
+			fos.write(pgpKey.keyData);
 		}
 		logger.debug("put() returning keyFile:" + keyFile);
 		return keyFile;

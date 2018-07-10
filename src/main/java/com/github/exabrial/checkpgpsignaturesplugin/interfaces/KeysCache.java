@@ -17,6 +17,7 @@
 package com.github.exabrial.checkpgpsignaturesplugin.interfaces;
 
 import java.io.File;
+import java.io.IOException;
 
 import com.github.exabrial.checkpgpsignaturesplugin.model.PGPKey;
 
@@ -24,6 +25,6 @@ public interface KeysCache {
 
 	File getKeyFile(String requiredKeyId);
 
-	File put(PGPKey pgpKey);
+	File put(PGPKey pgpKey) throws IOException;
 
 }

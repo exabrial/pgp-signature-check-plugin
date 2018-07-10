@@ -17,6 +17,7 @@
 package com.github.exabrial.checkpgpsignaturesplugin;
 
 import java.io.File;
+import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -55,7 +56,11 @@ public class ArtifactChecker {
 			File keyRing = pgpKeysCache.getKeyFile(keyId);
 			if (keyRing == null) {
 				final PGPKey pgpKey = pgpKeyRetriever.retrieveKey(keyId);
-				keyRing = pgpKeysCache.put(pgpKey);
+				try {
+					keyRing = pgpKeysCache.put(pgpKey);
+				} catch (final IOException e) {
+					throw new RuntimeException(e);
+				}
 			}
 			signatureChecker.checkArtifact(artifact.getFile(), signature.getFile(), keyRing, keyId);
 		}
