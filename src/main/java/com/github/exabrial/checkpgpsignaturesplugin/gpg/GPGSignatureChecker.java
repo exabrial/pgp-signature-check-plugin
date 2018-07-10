@@ -25,9 +25,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.cli.CommandLineException;
-import org.codehaus.plexus.util.cli.CommandLineUtils;
-import org.codehaus.plexus.util.cli.CommandLineUtils.StringStreamConsumer;
 import org.codehaus.plexus.util.cli.Commandline;
 
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.SignatureChecker;
@@ -44,13 +41,16 @@ public class GPGSignatureChecker implements SignatureChecker {
 			"^gpg:\\s+using subkey ([a-z0-9]{16,40}) instead of primary key ([a-z0-9]{16,40})$",
 			Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 	@Inject
-	private GPGExecutable gpgExecutable;
+	private CommandExecutor commandExecutor;
 	@Inject
+	private GPGExecutable gpgExecutable;
 	private Logger logger;
 
 	@Override
-	public void checkArtifact(final File artifactFile, final File signatureFile, final File keyRingFile, final String requiredKeyId)
+	public void checkArtifact(final File artifactFile, final File signatureFile, final File keyRingFile, final String keyId)
 			throws SignatureCheckFailedException {
+		logger.debug("checkArtifact() artifactFile:" + artifactFile + ", signatureFile:" + signatureFile + ", keyRingFile:" + keyRingFile
+				+ ", keyId:" + keyId);
 		final Commandline cmd = new Commandline();
 		cmd.setExecutable(gpgExecutable.getGPGExecutable());
 		cmd.createArg().setValue("--verbose");
@@ -60,15 +60,9 @@ public class GPGSignatureChecker implements SignatureChecker {
 		cmd.createArg().setValue("--verify");
 		cmd.createArg().setValue(signatureFile.getAbsolutePath());
 		cmd.createArg().setValue(artifactFile.getAbsolutePath());
-		logger.debug("checkArtifact() executing cmd:" + cmd);
-		try {
-			final StringStreamConsumer consumer = new StringStreamConsumer();
-			final int exitCode = CommandLineUtils.executeCommandLine(cmd, consumer, consumer);
-			if (exitCode != 0 || !isGoodOutput(consumer.getOutput(), requiredKeyId)) {
-				throw new SignatureCheckFailedException(exitCode, consumer);
-			}
-		} catch (final CommandLineException e) {
-			throw new RuntimeException(e);
+		final ExecutionResult result = commandExecutor.execute(cmd);
+		if (result.exitCode != 0 || !isGoodOutput(result.output, keyId)) {
+			throw new SignatureCheckFailedException(result, keyId, artifactFile);
 		}
 	}
 

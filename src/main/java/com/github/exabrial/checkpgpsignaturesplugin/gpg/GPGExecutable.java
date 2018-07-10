@@ -24,17 +24,18 @@ import javax.inject.Singleton;
 
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
-import org.codehaus.plexus.util.cli.CommandLineException;
-import org.codehaus.plexus.util.cli.CommandLineUtils;
-import org.codehaus.plexus.util.cli.CommandLineUtils.StringStreamConsumer;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.eclipse.sisu.Nullable;
+
+import com.github.exabrial.checkpgpsignaturesplugin.model.CantFindGPGException;
 
 @Named
 @Singleton
 public class GPGExecutable {
 	@Inject
 	private Logger logger;
+	@Inject
+	private CommandExecutor commandExecutor;
 	@Inject
 	@Nullable
 	@Named("${gpgExecutable}")
@@ -45,24 +46,18 @@ public class GPGExecutable {
 	public void postConstruct() {
 		final Commandline cmd = new Commandline();
 		if ((gpgExecutable = gpgExecutableProvider.get()) == null) {
-			try {
-				if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-					cmd.setExecutable("where.exe");
-					cmd.createArg().setValue("gpg.exe");
-				} else {
-					cmd.setExecutable("which");
-					cmd.createArg().setValue("gpg");
-				}
-				final StringStreamConsumer consumer = new StringStreamConsumer();
-				final int exitCode = CommandLineUtils.executeCommandLine(cmd, consumer, consumer);
-				if (exitCode != 0) {
-					logger.error("postConstruct() consumer.getOutput():" + consumer.getOutput());
-					throw new RuntimeException("Could not find gpg executable");
-				} else {
-					gpgExecutable = consumer.getOutput().trim();
-				}
-			} catch (final CommandLineException e) {
-				throw new RuntimeException(e);
+			if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+				cmd.setExecutable("where.exe");
+				cmd.createArg().setValue("gpg.exe");
+			} else {
+				cmd.setExecutable("which");
+				cmd.createArg().setValue("gpg");
+			}
+			final ExecutionResult result = commandExecutor.execute(cmd);
+			if (result.exitCode != 0) {
+				throw new CantFindGPGException(result);
+			} else {
+				gpgExecutable = result.output;
 			}
 		}
 		logger.info("postConstruct() using gpgExecutable:" + gpgExecutable);

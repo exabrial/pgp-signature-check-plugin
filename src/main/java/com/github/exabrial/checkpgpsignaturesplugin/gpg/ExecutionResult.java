@@ -14,17 +14,19 @@
  * the License.
  */
 
-package com.github.exabrial.checkpgpsignaturesplugin.model;
+package com.github.exabrial.checkpgpsignaturesplugin.gpg;
 
-import java.io.File;
+public class ExecutionResult {
+	public final int exitCode;
+	public final String output;
 
-import com.github.exabrial.checkpgpsignaturesplugin.gpg.ExecutionResult;
+	ExecutionResult(final int exitCode, final String output) {
+		this.exitCode = exitCode;
+		this.output = output;
+	}
 
-public class SignatureCheckFailedException extends RuntimeException {
-	private static final long serialVersionUID = 1L;
-
-	public SignatureCheckFailedException(final ExecutionResult result, final String keyId, final File artifactFile) {
-		super("Signature failure attempting to check file:" + artifactFile.getAbsolutePath() + "with keyId:" + keyId
-				+ "\nGPG exited with code:" + result.exitCode + "\noutput:\n" + result.output);
+	@Override
+	public String toString() {
+		return "ExecutionResult [exitCode=" + exitCode + "\n, output=\n" + output + "]";
 	}
 }
