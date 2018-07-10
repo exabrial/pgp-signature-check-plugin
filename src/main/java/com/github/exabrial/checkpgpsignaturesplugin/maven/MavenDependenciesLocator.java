@@ -17,6 +17,7 @@
 package com.github.exabrial.checkpgpsignaturesplugin.maven;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -25,8 +26,6 @@ import javax.inject.Singleton;
 
 import org.apache.maven.ProjectDependenciesResolver;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 
@@ -46,13 +45,13 @@ public class MavenDependenciesLocator implements DependenciesLocator {
 
 	@Override
 	public Set<Artifact> getArtifactsToVerify() {
-		Set<Artifact> artifacts;
 		try {
-			artifacts = projectDependenciesResolver.resolve(mavenProject, Arrays.asList(new String[] { "compile", "runtime", "test" }),
-					mavenSession);
-		} catch (ArtifactResolutionException | ArtifactNotFoundException e) {
+			// TODO Make this a mojo option
+			final List<String> scopes = Arrays.asList(new String[] { "compile", "runtime", "test" });
+			final Set<Artifact> artifacts = projectDependenciesResolver.resolve(mavenProject, scopes, mavenSession);
+			return artifacts;
+		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
-		return artifacts;
 	}
 }

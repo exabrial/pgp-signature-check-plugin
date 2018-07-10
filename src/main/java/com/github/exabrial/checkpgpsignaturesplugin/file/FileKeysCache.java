@@ -17,7 +17,6 @@
 package com.github.exabrial.checkpgpsignaturesplugin.file;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,6 +28,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.repository.RepositoryManager;
@@ -99,10 +99,7 @@ public class FileKeysCache implements KeysCache {
 		logger.debug("put() writing to disk pgpKey:" + pgpKey);
 		final File keyFile = new File(keyCacheDirectoryFile, pgpKey.keyId + ".kbx");
 		keyFile.createNewFile();
-		try (FileOutputStream fos = new FileOutputStream(keyFile)) {
-			logger.debug("put() writing data....");
-			fos.write(pgpKey.keyData);
-		}
+		FileUtils.writeByteArrayToFile(keyFile, pgpKey.keyData);
 		logger.debug("put() returning keyFile:" + keyFile);
 		return keyFile;
 	}

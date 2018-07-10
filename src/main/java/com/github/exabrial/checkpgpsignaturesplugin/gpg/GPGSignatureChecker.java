@@ -65,6 +65,8 @@ public class GPGSignatureChecker implements SignatureChecker {
 		}
 	}
 
+	// we check the exit code, but we also want to check to make sure it's signed
+	// with the key we specified, not another key.
 	protected static boolean isGoodOutput(final String output, final String requiredKeyId) {
 		try {
 			final Matcher signingKeyMatcher = signingKeyPattern.matcher(output);

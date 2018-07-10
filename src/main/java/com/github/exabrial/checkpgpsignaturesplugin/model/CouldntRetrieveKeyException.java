@@ -16,6 +16,8 @@
 
 package com.github.exabrial.checkpgpsignaturesplugin.model;
 
+import java.io.IOException;
+
 import com.github.exabrial.checkpgpsignaturesplugin.gpg.ExecutionResult;
 
 public class CouldntRetrieveKeyException extends RuntimeException {
@@ -25,4 +27,7 @@ public class CouldntRetrieveKeyException extends RuntimeException {
 		super("Could not retrieve key:" + keyId + ", gpg program gave exit code:" + result.exitCode + "\noutput:\n" + result.output);
 	}
 
+	public CouldntRetrieveKeyException(final IOException e) {
+		super(e);
+	}
 }

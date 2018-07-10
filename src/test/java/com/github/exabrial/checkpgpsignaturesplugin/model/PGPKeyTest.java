@@ -16,21 +16,24 @@
 
 package com.github.exabrial.checkpgpsignaturesplugin.model;
 
-public class PGPKey {
-	public final String keyId;
-	public final byte[] keyData;
+import static org.junit.Assert.assertNotNull;
 
-	public PGPKey(final String keyId, final byte[] keyData) {
-		if (keyId == null || keyData == null) {
-			throw new IllegalArgumentException("keyId and keyData must not be null");
-		} else {
-			this.keyId = keyId;
-			this.keyData = keyData;
-		}
+import org.junit.Test;
+
+public class PGPKeyTest {
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testPGPKey_nullid() {
+		new PGPKey(null, new byte[0]);
 	}
 
-	@Override
-	public String toString() {
-		return "PGPKey [keyId=" + keyId + ", keyData.length=" + keyData.length + "]";
+	@Test(expected = IllegalArgumentException.class)
+	public void testPGPKey_nullbytes() {
+		new PGPKey("keyid", null);
+	}
+
+	@Test
+	public void testToString() {
+		assertNotNull(new PGPKey("keyid", new byte[0]).toString());
 	}
 }
