@@ -11,13 +11,13 @@ I don't want to release until I have 100% test coverage. However, the plugin DOE
 
 ## Building
 
-You'll need Java8, a `~/.m2/toolchains.xml` [file](../blob/master/support-files/toolchains.xml) setup pointing to your Java8 install, and current Maven.
+You'll need Java8, a `~/.m2/toolchains.xml`[file](../master/support-files/toolchains.xml) setup pointing to your Java8 install, and current Maven.
 
 `mvn clean install -P skipChecks` use the `skipChecks` profile to skip static analysis. 
 
 ## Usage
 
-Create an `artifact-key-map.txt` in your project root. See the example [here](../blob/master/src/test/resources/artifact-key-map.txt)
+Create an `artifact-key-map.txt` in your project root. See the example [here](../master/src/test/resources/artifact-key-map.txt)
 
 ```
 <build>
