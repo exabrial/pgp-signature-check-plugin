@@ -44,6 +44,7 @@ public class GPGSignatureChecker implements SignatureChecker {
 	private CommandExecutor commandExecutor;
 	@Inject
 	private GPGExecutable gpgExecutable;
+	@Inject
 	private Logger logger;
 
 	@Override
