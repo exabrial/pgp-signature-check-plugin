@@ -17,7 +17,11 @@
 package com.github.exabrial.checkpgpsignaturesplugin;
 
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -35,6 +39,7 @@ import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeyRetriever;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeysCache;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.SignatureChecker;
 import com.github.exabrial.checkpgpsignaturesplugin.model.MissingKeyMappingException;
+import com.github.exabrial.checkpgpsignaturesplugin.model.PGPKey;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ArtifactCheckerTest {
@@ -57,8 +62,10 @@ public class ArtifactCheckerTest {
 	private final String keyId = "kid0";
 
 	@Test
-	public void testCheck() {
+	public void testCheck_cacheMiss() throws Exception {
 		when(pgpKeyIdResolver.resolveKeyIdFor(artifact)).thenReturn(keyId);
+		final PGPKey pgpKey = mock(PGPKey.class);
+		when(pgpKeyRetriever.retrieveKey(keyId)).thenReturn(pgpKey);
 
 		try {
 			artifactChecker.check(artifact, signature);
@@ -66,15 +73,14 @@ public class ArtifactCheckerTest {
 			e.printStackTrace();
 			fail("failed with exception");
 		}
-	}
 
-	@Test(expected = MissingKeyMappingException.class)
-	public void testCheck_noMappedKey() {
-		artifactChecker.check(artifact, signature);
+		verify(pgpKeysCache).getKeyFile(keyId);
+		verify(pgpKeyRetriever).retrieveKey(keyId);
+		verify(pgpKeysCache).put(pgpKey);
 	}
 
 	@Test
-	public void testCheck_keyLocationNotNull() {
+	public void testCheck_cacheHit() throws Exception {
 		when(pgpKeyIdResolver.resolveKeyIdFor(artifact)).thenReturn(keyId);
 		when(pgpKeysCache.getKeyFile(keyId)).thenReturn(mock(File.class));
 
@@ -84,6 +90,13 @@ public class ArtifactCheckerTest {
 			e.printStackTrace();
 			fail("failed with exception");
 		}
+		verify(pgpKeysCache).getKeyFile(keyId);
+		verify(pgpKeysCache, never()).put(any(PGPKey.class));
+		verifyZeroInteractions(pgpKeyRetriever);
 	}
 
+	@Test(expected = MissingKeyMappingException.class)
+	public void testCheck_noMappedKey() {
+		artifactChecker.check(artifact, signature);
+	}
 }
