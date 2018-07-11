@@ -55,6 +55,7 @@ public class GPGKeyRetriever implements KeyRetriever {
 				cmd.createArg().setValue("--verbose");
 				cmd.createArg().setValue("--recv-keys");
 				cmd.createArg().setValue("--no-default-keyring");
+				cmd.createArg().setValue("--always-trust");
 				cmd.createArg().setValue("--keyserver");
 				// TODO make server an option
 				cmd.createArg().setValue("hkps.pool.sks-keyservers.net");

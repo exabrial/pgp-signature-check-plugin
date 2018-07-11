@@ -54,6 +54,7 @@ public class GPGSignatureChecker implements SignatureChecker {
 		cmd.setExecutable(gpgExecutable.getGPGExecutable());
 		cmd.createArg().setValue("--verbose");
 		cmd.createArg().setValue("--no-default-keyring");
+		cmd.createArg().setValue("--always-trust");
 		cmd.createArg().setValue("--keyring");
 		cmd.createArg().setValue(keyRingFile.getAbsolutePath());
 		cmd.createArg().setValue("--verify");
