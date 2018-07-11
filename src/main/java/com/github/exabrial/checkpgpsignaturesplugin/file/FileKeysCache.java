@@ -38,8 +38,11 @@ import org.eclipse.sisu.Nullable;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeysCache;
 import com.github.exabrial.checkpgpsignaturesplugin.model.PGPKey;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 @Named
 @Singleton
+@SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
 public class FileKeysCache implements KeysCache {
 	private final Map<String, File> keyCache = Collections.synchronizedMap(new HashMap<>());
 	@Inject

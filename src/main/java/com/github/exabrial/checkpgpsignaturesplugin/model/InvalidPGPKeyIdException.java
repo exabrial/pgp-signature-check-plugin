@@ -14,14 +14,15 @@
  * the License.
  */
 
-package com.github.exabrial.checkpgpsignaturesplugin.repo;
+package com.github.exabrial.checkpgpsignaturesplugin.model;
 
-import org.apache.maven.artifact.Artifact;
+import java.util.regex.Pattern;
 
-public class NoASCArtifactException extends RuntimeException {
+public class InvalidPGPKeyIdException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
-	public NoASCArtifactException(final Artifact artifact) {
-		super("Could not resolve signature artifact:" + artifact);
+	public InvalidPGPKeyIdException(final String keyId, final Pattern keyIdPattern) {
+		super("Bad keyId:" + keyId + " must match:" + keyIdPattern.pattern());
 	}
+
 }

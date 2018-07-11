@@ -30,6 +30,7 @@ import org.codehaus.plexus.logging.Logger;
 
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.AscArtifactResolver;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.DependenciesLocator;
+import com.github.exabrial.checkpgpsignaturesplugin.model.NoSignatureFileFoundException;
 
 @Mojo(name = "pgp-signature-check", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, requiresProject = true)
 public class PGPSignatureCheckMojo extends AbstractMojo {
@@ -47,7 +48,13 @@ public class PGPSignatureCheckMojo extends AbstractMojo {
 		logger.info("execute() checking artifact PGP signatures...");
 		try {
 			final Set<Artifact> filtered = dependenciesLocator.getArtifactsToVerify();
-			filtered.forEach(artifact -> artifactChecker.check(artifact, ascArtifactResolver.resolveAscArtifact(artifact)));
+			filtered.forEach(artifact -> {
+				final Artifact ascArtifact = ascArtifactResolver.resolveAscArtifact(artifact);
+				if (ascArtifact == null) {
+					throw new NoSignatureFileFoundException(artifact);
+				}
+				artifactChecker.check(artifact, ascArtifact);
+			});
 		} catch (final Exception e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}

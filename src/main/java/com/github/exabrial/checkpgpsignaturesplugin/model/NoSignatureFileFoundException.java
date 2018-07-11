@@ -18,10 +18,10 @@ package com.github.exabrial.checkpgpsignaturesplugin.model;
 
 import org.apache.maven.artifact.Artifact;
 
-public class NoASCArtifactException extends RuntimeException {
+public class NoSignatureFileFoundException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
-	public NoASCArtifactException(final Artifact artifact) {
+	public NoSignatureFileFoundException(final Artifact artifact) {
 		super("Could not resolve signature artifact:" + artifact);
 	}
 }

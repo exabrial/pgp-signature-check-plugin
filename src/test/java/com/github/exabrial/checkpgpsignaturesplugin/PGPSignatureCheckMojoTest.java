@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 import java.util.HashSet;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.logging.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,8 +55,17 @@ public class PGPSignatureCheckMojoTest {
 		when(dependenciesLocator.getArtifactsToVerify()).thenReturn(artifacts);
 		final Artifact ascArtifact = mock(Artifact.class);
 		when(ascArtifactResolver.resolveAscArtifact(projectArtifact)).thenReturn(ascArtifact);
-
 		pgpSignatureCheckMojo.execute();
 		verify(artifactChecker).check(projectArtifact, ascArtifact);
+	}
+
+	@Test(expected = MojoExecutionException.class)
+	public void testExecute_noSignature() throws Exception {
+		final HashSet<Artifact> artifacts = new HashSet<>();
+		final Artifact projectArtifact = mock(Artifact.class);
+		artifacts.add(projectArtifact);
+		when(dependenciesLocator.getArtifactsToVerify()).thenReturn(artifacts);
+		when(ascArtifactResolver.resolveAscArtifact(projectArtifact)).thenReturn(null);
+		pgpSignatureCheckMojo.execute();
 	}
 }

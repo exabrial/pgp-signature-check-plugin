@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.maven.artifact.Artifact;
@@ -38,16 +39,17 @@ import org.codehaus.plexus.logging.Logger;
 import org.eclipse.sisu.Nullable;
 
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeyIdResolver;
+import com.github.exabrial.checkpgpsignaturesplugin.model.InvalidPGPKeyIdException;
 
 @Named
 @Singleton
 public class MapFileKeyIdResolver implements KeyIdResolver {
-	private static final Pattern keyIdPattern = Pattern.compile("^0x[A-Za-z0-9]{16,40}$");
+	private static final Pattern keyIdPattern = Pattern.compile("^0x[a-f0-9]{16,40}$", Pattern.CASE_INSENSITIVE);
 	private final Map<StrictPatternIncludesArtifactFilter, String> artifactKeyMap = new HashMap<>();
 	@Inject
 	@Nullable
-	@Named("${keyMapFileName:-artifact-key-map.txt}")
-	private String keyMapFileName;
+	@Named("${keyMapFileName}")
+	private Provider<String> keyMapFileNameProvider;
 	@Inject
 	private MavenProject project;
 	@Inject
@@ -55,33 +57,21 @@ public class MapFileKeyIdResolver implements KeyIdResolver {
 
 	@PostConstruct
 	void postConstruct() {
-		final File keyMapFile = new File(project.getBasedir().getAbsolutePath() + File.separator + keyMapFileName);
-		logger.info("postConstruct() using keyMapFile:" + keyMapFile.getAbsolutePath());
+		String keyMapFileName = keyMapFileNameProvider.get();
+		if (keyMapFileName == null) {
+			keyMapFileName = "artifact-key-map.txt";
+		}
+		final File keyMapFile = new File(project.getBasedir(), keyMapFileName);
 		if (!keyMapFile.exists()) {
-			throw new RuntimeException("keyMapFile:" + keyMapFile.getAbsolutePath() + " does not exist");
+			throw new MissingKeyMapFileException(keyMapFile);
 		} else {
 			try {
+				logger.info("postConstruct() using keyMapFile:" + keyMapFile.getAbsolutePath());
 				final List<String> lines = Files.readAllLines(Paths.get(keyMapFile.getAbsolutePath()));
 				lines.stream().forEach(line -> parse(line.trim()));
 			} catch (final IOException e) {
 				throw new RuntimeException(e);
 			}
-		}
-	}
-
-	private void parse(final String line) {
-		if (line == null || line.equals("") || line.startsWith("#")) {
-		} else {
-			final String[] values = line.split("=");
-			checkKeyId(values[1]);
-			final StrictPatternIncludesArtifactFilter filter = new StrictPatternIncludesArtifactFilter(Arrays.asList(values[0]));
-			artifactKeyMap.put(filter, values[1].substring(2));
-		}
-	}
-
-	public static void checkKeyId(final String keyId) {
-		if (!keyIdPattern.matcher(keyId).matches()) {
-			throw new RuntimeException("Bad keyId:" + keyId + " must match:" + keyIdPattern.pattern());
 		}
 	}
 
@@ -91,5 +81,20 @@ public class MapFileKeyIdResolver implements KeyIdResolver {
 				.map(artifactKeyMap::get).orElse(null);
 		logger.debug("resolveKeyIdFor() artifact:" + artifact + " mapped to keyId:" + keyId);
 		return keyId;
+	}
+
+	private void parse(final String line) {
+		if (!line.equals("") && !line.startsWith("#")) {
+			final String[] values = line.split("=");
+			checkKeyId(values[1]);
+			final StrictPatternIncludesArtifactFilter filter = new StrictPatternIncludesArtifactFilter(Arrays.asList(values[0]));
+			artifactKeyMap.put(filter, values[1].substring(2));
+		}
+	}
+
+	private static void checkKeyId(final String keyId) {
+		if (!keyIdPattern.matcher(keyId).matches()) {
+			throw new InvalidPGPKeyIdException(keyId, keyIdPattern);
+		}
 	}
 }

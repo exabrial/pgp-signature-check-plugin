@@ -31,8 +31,11 @@ import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeyRetriever;
 import com.github.exabrial.checkpgpsignaturesplugin.model.CouldntRetrieveKeyException;
 import com.github.exabrial.checkpgpsignaturesplugin.model.PGPKey;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 @Named
 @Singleton
+@SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
 public class GPGKeyRetriever implements KeyRetriever {
 	@Inject
 	private CommandExecutor commandExecutor;

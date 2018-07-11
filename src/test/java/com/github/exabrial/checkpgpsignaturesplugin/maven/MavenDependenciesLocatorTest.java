@@ -21,7 +21,6 @@ import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -57,7 +56,8 @@ public class MavenDependenciesLocatorTest {
 
 	@Test(expected = RuntimeException.class)
 	public void testGetArtifactsToVerify_err() throws Exception {
-		when(projectDependenciesResolver.resolve(eq(mavenProject), anyCollection(), eq(mavenSession))).thenThrow(new IOException());
+		when(projectDependenciesResolver.resolve(eq(mavenProject), anyCollection(), eq(mavenSession)))
+				.thenThrow(new IllegalArgumentException());
 		mavenDependenciesLocator.getArtifactsToVerify();
 	}
 }
