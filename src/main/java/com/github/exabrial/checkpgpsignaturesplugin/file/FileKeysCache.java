@@ -33,7 +33,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.repository.RepositoryManager;
 import org.codehaus.plexus.logging.Logger;
-import org.eclipse.sisu.Nullable;
 
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeysCache;
 import com.github.exabrial.checkpgpsignaturesplugin.model.PGPKey;
@@ -52,7 +51,6 @@ public class FileKeysCache implements KeysCache {
 	@Inject
 	private MavenSession mavenSession;
 	@Inject
-	@Nullable
 	@Named("${keyCacheDirectory}")
 	private Provider<String> keyCacheDirectory;
 	private File keyCacheDirectoryFile;

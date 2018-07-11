@@ -36,7 +36,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.artifact.filter.StrictPatternIncludesArtifactFilter;
 import org.codehaus.plexus.logging.Logger;
-import org.eclipse.sisu.Nullable;
 
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeyIdResolver;
 import com.github.exabrial.checkpgpsignaturesplugin.model.InvalidPGPKeyIdException;
@@ -47,7 +46,6 @@ public class MapFileKeyIdResolver implements KeyIdResolver {
 	private static final Pattern keyIdPattern = Pattern.compile("^0x[a-f0-9]{16,40}$", Pattern.CASE_INSENSITIVE);
 	private final Map<StrictPatternIncludesArtifactFilter, String> artifactKeyMap = new HashMap<>();
 	@Inject
-	@Nullable
 	@Named("${keyMapFileName}")
 	private Provider<String> keyMapFileNameProvider;
 	@Inject

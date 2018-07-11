@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.cli.Commandline;
-import org.eclipse.sisu.Nullable;
 
 import com.github.exabrial.checkpgpsignaturesplugin.model.CantFindGPGException;
 
@@ -37,7 +36,6 @@ public class GPGExecutable {
 	@Inject
 	private CommandExecutor commandExecutor;
 	@Inject
-	@Nullable
 	@Named("${gpgExecutable}")
 	private Provider<String> gpgExecutableProvider;
 	private String gpgExecutable;
