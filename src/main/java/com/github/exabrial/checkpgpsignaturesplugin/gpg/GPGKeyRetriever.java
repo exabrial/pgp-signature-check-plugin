@@ -57,7 +57,7 @@ public class GPGKeyRetriever implements KeyRetriever {
 				cmd.createArg().setValue("--no-default-keyring");
 				cmd.createArg().setValue("--keyserver");
 				// TODO make server an option
-				cmd.createArg().setValue("pool.sks-keyservers.net");
+				cmd.createArg().setValue("hkps.pool.sks-keyservers.net");
 				cmd.createArg().setValue("--keyring");
 				cmd.createArg().setValue(tempKeyFile.getAbsolutePath());
 				cmd.createArg().setValue(keyId);
