@@ -32,3 +32,4 @@ dependency-reduced-pom.xml
 # Misc #
 *.log
 .DS_Store
+/bin/

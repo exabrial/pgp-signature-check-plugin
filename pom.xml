@@ -650,125 +650,133 @@
 					<artifactId>maven-plugin-plugin</artifactId>
 					<version>3.3</version>
 				</plugin>
+				<plugin>
+					<groupId>com.github.github</groupId>
+					<artifactId>site-maven-plugin</artifactId>
+					<version>0.12</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jxr-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-pmd-plugin</artifactId>
-				<configuration>
-					<rulesets>
-						<ruleset>/support-files/pmd.xml</ruleset>
-					</rulesets>
-					<skipEmptyReport>false</skipEmptyReport>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<configuration>
-					<configLocation>${project.basedir}/support-files/checkstyle.xml</configLocation>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>com.github.spotbugs</groupId>
-				<artifactId>spotbugs-maven-plugin</artifactId>
-				<configuration>
-					<effort>max</effort>
-					<threshold>low</threshold>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-report-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.rat</groupId>
-				<artifactId>apache-rat-plugin</artifactId>
-				<configuration>
-					<licenses>
-						<license implementation="org.apache.rat.analysis.license.SimplePatternBasedLicense">
-							<licenseFamilyCategory>AL</licenseFamilyCategory>
-							<licenseFamilyName>Apache License 2.0</licenseFamilyName>
-						</license>
-					</licenses>
-					<excludes>
-						<exclude>*.md</exclude>
-						<exclude>support-files/*</exclude>
-						<exclude>CLs/*</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>**/HelpMojo*</exclude>
-					</excludes>
-				</configuration>
-				<reportSets>
-					<reportSet>
-						<id>JaCoCo-UnitTest</id>
-						<reports>
-							<report>report</report>
-						</reports>
-						<configuration>
-							<dataFile>${project.build.directory}/jacoco-ut.exec</dataFile>
-						</configuration>
-					</reportSet>
-					<reportSet>
-						<id>JaCoCo-IntegrationTest</id>
-						<reports>
-							<report>report</report>
-						</reports>
-						<configuration>
-							<dataFile>${project.build.directory}/jacoco-it.exec</dataFile>
-						</configuration>
-					</reportSet>
-				</reportSets>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jdepend-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>taglist-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>versions-maven-plugin</artifactId>
-				<reportSets>
-					<reportSet>
-						<reports>
-							<report>dependency-updates-report</report>
-							<report>plugin-updates-report</report>
-						</reports>
-					</reportSet>
-				</reportSets>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-plugin-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</reporting>
 	<profiles>
+		<profile>
+			<id>site</id>
+			<reporting>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jxr-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-pmd-plugin</artifactId>
+						<configuration>
+							<rulesets>
+								<ruleset>/support-files/pmd.xml</ruleset>
+							</rulesets>
+							<skipEmptyReport>false</skipEmptyReport>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-checkstyle-plugin</artifactId>
+						<configuration>
+							<configLocation>${project.basedir}/support-files/checkstyle.xml</configLocation>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>com.github.spotbugs</groupId>
+						<artifactId>spotbugs-maven-plugin</artifactId>
+						<configuration>
+							<effort>max</effort>
+							<threshold>low</threshold>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-report-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.rat</groupId>
+						<artifactId>apache-rat-plugin</artifactId>
+						<configuration>
+							<licenses>
+								<license implementation="org.apache.rat.analysis.license.SimplePatternBasedLicense">
+									<licenseFamilyCategory>AL</licenseFamilyCategory>
+									<licenseFamilyName>Apache License 2.0</licenseFamilyName>
+								</license>
+							</licenses>
+							<excludes>
+								<exclude>*.md</exclude>
+								<exclude>support-files/*</exclude>
+								<exclude>CLs/*</exclude>
+							</excludes>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<configuration>
+							<excludes>
+								<exclude>**/HelpMojo*</exclude>
+							</excludes>
+						</configuration>
+						<reportSets>
+							<reportSet>
+								<id>JaCoCo-UnitTest</id>
+								<reports>
+									<report>report</report>
+								</reports>
+								<configuration>
+									<dataFile>${project.build.directory}/jacoco-ut.exec</dataFile>
+								</configuration>
+							</reportSet>
+							<reportSet>
+								<id>JaCoCo-IntegrationTest</id>
+								<reports>
+									<report>report</report>
+								</reports>
+								<configuration>
+									<dataFile>${project.build.directory}/jacoco-it.exec</dataFile>
+								</configuration>
+							</reportSet>
+						</reportSets>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>jdepend-maven-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>taglist-maven-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>versions-maven-plugin</artifactId>
+						<reportSets>
+							<reportSet>
+								<reports>
+									<report>dependency-updates-report</report>
+									<report>plugin-updates-report</report>
+								</reports>
+							</reportSet>
+						</reportSets>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-plugin-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</reporting>
+		</profile>
 		<profile>
 			<id>skipChecks</id>
 			<properties>
@@ -779,6 +787,7 @@
 				<spotbugs.skip>true</spotbugs.skip>
 				<mdep.analyze.skip>true</mdep.analyze.skip>
 				<jacoco.skip>true</jacoco.skip>
+				<mdep.skip>true</mdep.skip>
 			</properties>
 		</profile>
 		<profile>
@@ -786,6 +795,37 @@
 			<properties>
 				<gpg.skip>false</gpg.skip>
 			</properties>
+		</profile>
+		<profile>
+			<id>ghsite</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-site-plugin</artifactId>
+						<configuration>
+							<siteDirectory>${basedir}/src/ghsite</siteDirectory>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+			<reporting>
+				<excludeDefaults>true</excludeDefaults>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-plugin-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>com.github.github</groupId>
+						<artifactId>site-maven-plugin</artifactId>
+						<configuration>
+							<server>github</server>
+							<message>Updating plugin site</message>
+						</configuration>
+					</plugin>
+				</plugins>
+			</reporting>
 		</profile>
 	</profiles>
 	<pluginRepositories>
