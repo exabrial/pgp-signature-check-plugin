@@ -310,7 +310,7 @@
 						</license>
 					</licenses>
 					<excludes>
-						<exclude>*.md</exclude>
+						<exclude>**/**.md</exclude>
 						<exclude>support-files/*</exclude>
 						<exclude>CLs/*</exclude>
 					</excludes>
@@ -707,7 +707,7 @@
 								</license>
 							</licenses>
 							<excludes>
-								<exclude>*.md</exclude>
+								<exclude>**/**.md</exclude>
 								<exclude>support-files/*</exclude>
 								<exclude>CLs/*</exclude>
 							</excludes>

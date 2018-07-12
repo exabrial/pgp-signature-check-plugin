@@ -16,6 +16,7 @@ But here are the Maven Coordinates:
 <groupId>com.github.exabrial</groupId>
 <artifactId>pgp-signature-check-plugin</artifactId>
 ```
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.exabrial/pgp-signature-check-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.exabrial/pgp-signature-check-plugin)
 
 
 ## Building
