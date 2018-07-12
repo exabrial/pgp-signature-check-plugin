@@ -26,12 +26,19 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.logging.Logger;
 
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.AscArtifactResolver;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.DependenciesLocator;
 import com.github.exabrial.checkpgpsignaturesplugin.model.NoSignatureFileFoundException;
 
+/**
+ * This goal will download the asc signatures for artifacts in the build and
+ * verify their integrity.
+ *
+ * @since 1.0.0
+ */
 @Mojo(name = "pgp-signature-check", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, requiresProject = true)
 public class PGPSignatureCheckMojo extends AbstractMojo {
 	@Inject
@@ -42,6 +49,33 @@ public class PGPSignatureCheckMojo extends AbstractMojo {
 	private DependenciesLocator dependenciesLocator;
 	@Inject
 	private Logger logger;
+	/**
+	 * The fully qualified path to the gpg executable. If not specified, the plugin
+	 * will perform a which/where.exe lookup
+	 */
+	@Parameter
+	private String gpgExecutable;
+	/**
+	 * The fully qualified path to the directory where pgp keys will be cached. The
+	 * plugin will not automatically create this directory if it doesn't exist.
+	 */
+	@Parameter(defaultValue = "~/.m2/artifactPubKeys")
+	private String keyCacheDirectory;
+	/**
+	 * The fully qualified path of the file used to pin artifacts to pgp keys. The
+	 * format is:
+	 * <p>
+	 * groupId:artifactId:version=0xPGPKeyFingerprint (16-40 hex chars)
+	 * </p>
+	 * So for bouncycastle, that'd look like:
+	 * <p>
+	 * org.bouncycastle:*:*=0x08F0AAB4D0C1A4BDDE340765B341DDB020FCB6AB
+	 * </p>
+	 * Wildcards are allowed. All lines are trimmed. Comments begin the # [hash]
+	 * character.
+	 */
+	@Parameter(defaultValue = "${project.basedir}/artifact-key-map.txt")
+	private String keyMapFileName;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {

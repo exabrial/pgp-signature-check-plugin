@@ -15,8 +15,8 @@
 		<artifactId>maven-fluido-skin</artifactId>
 		<version>1.7</version>
 	</skin>
-	<publishDate position="right" />
-	<version position="right" />
+	<publishDate position="left" />
+	<version position="left" />
 	<custom>
 		<fluidoSkin>
 			<topBarEnabled>false</topBarEnabled>

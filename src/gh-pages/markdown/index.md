@@ -15,23 +15,31 @@ Next add this to your build section:
 ```
 <build>
 ...
-	<plugins>
+  <plugins>
 ...
-		<plugin>
-			<groupId>com.github.exabrial</groupId>
-			<artifactId>pgp-signature-check-plugin</artifactId>
-			<version>LATEST RELEASE VERSION</version>
-			<executions>
-				<execution>
-					<id>pgp-signature-check</id>
-					<goals>
-						<goal>pgp-signature-check</goal>
-					</goals>
-				</execution>
-			</executions>
-		</plugin>
-	</plugins>
+    <plugin>
+      <groupId>com.github.exabrial</groupId>
+      <artifactId>pgp-signature-check-plugin</artifactId>
+      <version>${version.pgp-signature-check}</version>
+      <executions>
+        <execution>
+          <id>pgp-signature-check</id>
+          <goals>
+            <goal>pgp-signature-check</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+...
+  </plugins>
+...
 </build>
 ```
+
+For the value of `${version.pgp-signature-check}`, the latest release version is:
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.exabrial/pgp-signature-check-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.exabrial/pgp-signature-check-plugin)
+
+
 
 Finally just run `mvn pgp-signature-check:pgp-signature-check` or your normal build process!
