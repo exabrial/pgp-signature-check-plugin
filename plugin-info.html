@@ -14,7 +14,6 @@
     <link rel="stylesheet" href="./css/site.css" />
     <link rel="stylesheet" href="./css/print.css" media="print" />
     <script type="text/javascript" src="./js/apache-maven-fluido-1.7.min.js"></script>
-PGP Signature Check Plugin for Maven
   </head>
   <body class="topBarDisabled">
     <a href="https://github.com/exabrial/pgp-signature-check-plugin">
@@ -33,8 +32,9 @@ PGP Signature Check Plugin for Maven
 
       <div id="breadcrumbs">
         <ul class="breadcrumb">
-        <li id="publishDate" class="pull-right"><span class="divider">|</span> Last Published: 2018-07-12</li>
-          <li id="projectVersion" class="pull-right">Version: 1.0.1-SNAPSHOT</li>
+        <li id="publishDate">Last Published: 2018-07-12<span class="divider">|</span>
+</li>
+          <li id="projectVersion">Version: 1.0.1</li>
         </ul>
       </div>
       <div class="row-fluid">
@@ -76,15 +76,8 @@ Call <code>mvn pgp-signature-check:help -Ddetail=true
 -Dgoal=&lt;goal-name&gt;</code> to display parameter details.</td></tr>
 <tr class="a">
 <td><a href="pgp-signature-check-mojo.html">pgp-signature-check:pgp-signature-check</a></td>
-<td>Copyright [2018] [Jonathan S. Fisher] Licensed under the Apache
-License, Version 2.0 (the "License"); you may not use this file
-except in compliance with the License. You may obtain a copy of the
-License at http://www.apache.org/licenses/LICENSE-2.0 Unless
-required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-implied. See the License for the specific language governing
-permissions and limitations under the License.</td></tr></table>
+<td>This goal will download the asc signatures for artifacts in the
+build and verify their integrity.</td></tr></table>
 <div class="section">
 <h3><a name="System_Requirements"></a>System Requirements</h3><a name="System_Requirements"></a>
 <p>The following specifies the minimum requirements to run this Maven plugin:</p>
@@ -113,7 +106,7 @@ permissions and limitations under the License.</td></tr></table>
         &lt;plugin&gt;
           &lt;groupId&gt;com.github.exabrial&lt;/groupId&gt;
           &lt;artifactId&gt;pgp-signature-check-plugin&lt;/artifactId&gt;
-          &lt;version&gt;1.0.1-SNAPSHOT&lt;/version&gt;
+          &lt;version&gt;1.0.1&lt;/version&gt;
         &lt;/plugin&gt;
         ...
       &lt;/plugins&gt;
@@ -123,7 +116,7 @@ permissions and limitations under the License.</td></tr></table>
       &lt;plugin&gt;
         &lt;groupId&gt;com.github.exabrial&lt;/groupId&gt;
         &lt;artifactId&gt;pgp-signature-check-plugin&lt;/artifactId&gt;
-        &lt;version&gt;1.0.1-SNAPSHOT&lt;/version&gt;
+        &lt;version&gt;1.0.1&lt;/version&gt;
       &lt;/plugin&gt;
       ...
     &lt;/plugins&gt;
