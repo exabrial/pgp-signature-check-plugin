@@ -30,7 +30,6 @@
 		</fluidoSkin>
 	</custom>
 	<body>
-		<head>PGP Signature Check Plugin for Maven</head>
 		<menu name="Overview">
 			<item
 				name="Introduction"
