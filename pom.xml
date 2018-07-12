@@ -797,14 +797,14 @@
 			</properties>
 		</profile>
 		<profile>
-			<id>ghsite</id>
+			<id>gh-pages</id>
 			<build>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-site-plugin</artifactId>
 						<configuration>
-							<siteDirectory>${basedir}/src/ghsite</siteDirectory>
+							<siteDirectory>${basedir}/src/gh-pages</siteDirectory>
 						</configuration>
 					</plugin>
 				</plugins>
