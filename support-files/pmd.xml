@@ -7,6 +7,6 @@
 	<description>
 		Include the default ruleset but exclude the HelpMojo class.
 	</description>
-	<exclude-pattern>com/github/exabrial/checkpgpsignaturesplugin/HelpMojo*</exclude-pattern>
+	<exclude-pattern>com.github.exabrial.checkpgpsignaturesplugin.HelpMojo*</exclude-pattern>
 	<rule ref="rulesets/java/maven-pmd-plugin-default.xml" />
 </ruleset>
