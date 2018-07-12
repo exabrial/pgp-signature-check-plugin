@@ -345,11 +345,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<configuration>
-					<rulesets>
-						<ruleset>/support-files/pmd.xml</ruleset>
-					</rulesets>
-				</configuration>
 				<executions>
 					<execution>
 						<id>pmd-verify</id>
@@ -358,6 +353,7 @@
 							<goal>cpd-check</goal>
 						</goals>
 						<configuration>
+							<excludeFromFailureFile>${basedir}/support-files/pmd-excludes.properties</excludeFromFailureFile>
 							<printFailingErrors>true</printFailingErrors>
 						</configuration>
 					</execution>
@@ -671,9 +667,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-pmd-plugin</artifactId>
 						<configuration>
-							<rulesets>
-								<ruleset>/support-files/pmd.xml</ruleset>
-							</rulesets>
+							<excludeFromFailureFile>${basedir}/support-files/pmd-excludes.properties</excludeFromFailureFile>
 							<skipEmptyReport>false</skipEmptyReport>
 						</configuration>
 					</plugin>

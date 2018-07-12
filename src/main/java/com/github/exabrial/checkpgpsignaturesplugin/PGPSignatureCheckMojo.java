@@ -54,13 +54,13 @@ public class PGPSignatureCheckMojo extends AbstractMojo {
 	 * will perform a which/where.exe lookup
 	 */
 	@Parameter
-	private String gpgExecutable;// NOPMD
+	private String gpgExecutable;
 	/**
 	 * The fully qualified path to the directory where pgp keys will be cached. The
 	 * plugin will not automatically create this directory if it doesn't exist.
 	 */
 	@Parameter(defaultValue = "~/.m2/artifactPubKeys")
-	private String keyCacheDirectory;// NOPMD
+	private String keyCacheDirectory;
 	/**
 	 * The fully qualified path of the file used to pin artifacts to pgp keys. The
 	 * format is:
@@ -75,7 +75,7 @@ public class PGPSignatureCheckMojo extends AbstractMojo {
 	 * character.
 	 */
 	@Parameter(defaultValue = "${project.basedir}/artifact-key-map.txt")
-	private String keyMapFileName;// NOPMD
+	private String keyMapFileName;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
