@@ -8,44 +8,33 @@ This entire project was inspired by the amazing work over at https://github.com/
 
 ## Usage
 
-Create an `artifact-key-map.txt` in your project root that pins artifacts to PGP keys. Wildcards are allowed. The syntax is `groupid:artifactid:version=0xPGPkeyfingerprint`. See the example [here](../master/src/test/resources/artifact-key-map.txt).
+Please see the docs at http://exabrial.github.io/pgp-signature-check-plugin/
+
+But here are the Maven Coordinates:
 
 ```
-org.bouncycastle:*:*=0x08F0AAB4D0C1A4BDDE340765B341DDB020FCB6AB
-org.junit.*:*:*=0xFF6E2C001948C5F2F38B0CC385911F425EC61B51
-org.opentest4j:*:*=0xFF6E2C001948C5F2F38B0CC385911F425EC61B51
+<groupId>com.github.exabrial</groupId>
+<artifactId>pgp-signature-check-plugin</artifactId>
 ```
-
-Next add this to your build section:
-
-```
-<build>
-...
-	<plugins>
-...
-		<plugin>
-			<groupId>com.github.exabrial</groupId>
-			<artifactId>pgp-signature-check-plugin</artifactId>
-			<version>1.0.0</version>
-			<executions>
-				<execution>
-					<id>pgp-signature-check</id>
-					<goals>
-						<goal>pgp-signature-check</goal>
-					</goals>
-				</execution>
-			</executions>
-		</plugin>
-	</plugins>
-</build>
-```
-
-Finally just run `mvn pgp-signature-check:pgp-signature-check` or your normal build process!
 
 
 ## Building
 
 You'll need Java8, a `~/.m2/toolchains.xml`[file](../master/support-files/toolchains.xml) setup pointing to your Java8 install, and current Maven.
 
-`mvn clean install -P skipChecks` use the `skipChecks` profile to skip static analysis. 
+### Profiles
+
+#### skipChecks
+* `mvn clean install -P skipChecks`
+* Skips all static analysis, runs unit tests
+
+#### site
+
+* `mvn clean install -P site`
+* Reports on all static analysis. Handy to see unit test coverage
+
+#### gh-pages
+
+* `mvn clean install -P gh-pages`
+* Builds and deploys the public facing website
 
