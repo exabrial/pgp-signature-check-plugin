@@ -71,11 +71,21 @@ public class PGPSignatureCheckMojoTest {
 	}
 
 	@Test(expected = MojoExecutionException.class)
-	public void testExecute_noSignature() throws Exception {
+	public void testExecute_missingMapping() throws Exception {
 		final HashSet<Artifact> artifacts = new HashSet<>();
 		final Artifact projectArtifact = mock(Artifact.class);
 		artifacts.add(projectArtifact);
 		when(dependenciesLocator.getArtifactsToVerify()).thenReturn(artifacts);
+		pgpSignatureCheckMojo.execute();
+	}
+
+	@Test(expected = MojoExecutionException.class)
+	public void testExecute_missingSignature() throws Exception {
+		final HashSet<Artifact> artifacts = new HashSet<>();
+		final Artifact projectArtifact = mock(Artifact.class);
+		artifacts.add(projectArtifact);
+		when(dependenciesLocator.getArtifactsToVerify()).thenReturn(artifacts);
+		when(pgpKeyIdResolver.resolveKeyIdFor(projectArtifact)).thenReturn(keyId);
 		pgpSignatureCheckMojo.execute();
 	}
 

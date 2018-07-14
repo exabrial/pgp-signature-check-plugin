@@ -41,6 +41,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import com.github.exabrial.checkpgpsignaturesplugin.model.NoProjectArtifactFoundException;
+
 @RunWith(MockitoJUnitRunner.class)
 public class MavenDependenciesLocatorTest {
 	@InjectMocks
@@ -80,5 +82,12 @@ public class MavenDependenciesLocatorTest {
 	public void testGetArtifactsToVerify_noPoms() throws Exception {
 		when(checkPomSignatures.get()).thenReturn(false);
 		assertEquals(artifacts, mavenDependenciesLocator.getArtifactsToVerify());
+	}
+
+	@Test(expected = NoProjectArtifactFoundException.class)
+	public void testGetArtifactsToVerify_missingProject() throws Exception {
+		when(checkPomSignatures.get()).thenReturn(true);
+		when(artifactResolutionResult.getArtifacts()).thenReturn(new HashSet<>());
+		mavenDependenciesLocator.getArtifactsToVerify();
 	}
 }
