@@ -44,9 +44,9 @@ import com.github.exabrial.checkpgpsignaturesplugin.model.SignatureCheckFailedEx
  * @since 1.0.0
  */
 @Mojo(name = "pgp-signature-check",
-defaultPhase = LifecyclePhase.PROCESS_RESOURCES,
-requiresProject = true,
-requiresDependencyResolution = ResolutionScope.TEST)
+			defaultPhase = LifecyclePhase.PROCESS_RESOURCES,
+			requiresProject = true,
+			requiresDependencyResolution = ResolutionScope.TEST)
 public class PGPSignatureCheckMojo extends AbstractMojo {
 	@Inject
 	private ArtifactChecker artifactChecker;
