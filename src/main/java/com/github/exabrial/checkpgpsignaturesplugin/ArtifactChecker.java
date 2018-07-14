@@ -26,11 +26,9 @@ import javax.inject.Singleton;
 import org.apache.maven.artifact.Artifact;
 import org.codehaus.plexus.logging.Logger;
 
-import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeyIdResolver;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeyRetriever;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeysCache;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.SignatureChecker;
-import com.github.exabrial.checkpgpsignaturesplugin.model.MissingKeyMappingException;
 import com.github.exabrial.checkpgpsignaturesplugin.model.PGPKey;
 
 @Named
@@ -41,29 +39,22 @@ public class ArtifactChecker {
 	@Inject
 	private KeyRetriever pgpKeyRetriever;
 	@Inject
-	private KeyIdResolver pgpKeyIdResolver;
-	@Inject
 	private SignatureChecker signatureChecker;
 	@Inject
 	private Logger logger;
 
-	public void check(final Artifact artifact, final Artifact signature) {
+	public void check(final Artifact artifact, final Artifact signature, final String keyId) {
 		logger.debug("check() artifact:" + artifact);
-		final String keyId = pgpKeyIdResolver.resolveKeyIdFor(artifact);
-		if (keyId == null) {
-			throw new MissingKeyMappingException(artifact);
-		} else {
-			File keyRing = pgpKeysCache.getKeyFile(keyId);
-			if (keyRing == null) {
-				final PGPKey pgpKey = pgpKeyRetriever.retrieveKey(keyId);
-				try {
-					keyRing = pgpKeysCache.put(pgpKey);
-				} catch (final IOException e) {
-					throw new RuntimeException(e);
-				}
+		File keyRing = pgpKeysCache.getKeyFile(keyId);
+		if (keyRing == null) {
+			final PGPKey pgpKey = pgpKeyRetriever.retrieveKey(keyId);
+			try {
+				keyRing = pgpKeysCache.put(pgpKey);
+			} catch (final IOException e) {
+				throw new RuntimeException(e);
 			}
-			signatureChecker.checkArtifact(artifact.getFile(), signature.getFile(), keyRing, keyId);
 		}
+		signatureChecker.checkArtifact(artifact.getFile(), signature.getFile(), keyRing, keyId);
 		logger.info("check() artifact:" + artifact + " signed with key:" + keyId);
 	}
 }

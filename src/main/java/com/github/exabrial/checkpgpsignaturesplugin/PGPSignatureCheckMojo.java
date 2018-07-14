@@ -27,11 +27,15 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.codehaus.plexus.logging.Logger;
 
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.AscArtifactResolver;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.DependenciesLocator;
+import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeyIdResolver;
+import com.github.exabrial.checkpgpsignaturesplugin.model.MissingKeyMappingException;
 import com.github.exabrial.checkpgpsignaturesplugin.model.NoSignatureFileFoundException;
+import com.github.exabrial.checkpgpsignaturesplugin.model.SignatureCheckFailedException;
 
 /**
  * This goal will download the asc signatures for artifacts in the build and
@@ -39,7 +43,10 @@ import com.github.exabrial.checkpgpsignaturesplugin.model.NoSignatureFileFoundEx
  *
  * @since 1.0.0
  */
-@Mojo(name = "pgp-signature-check", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, requiresProject = true)
+@Mojo(name = "pgp-signature-check",
+defaultPhase = LifecyclePhase.PROCESS_RESOURCES,
+requiresProject = true,
+requiresDependencyResolution = ResolutionScope.TEST)
 public class PGPSignatureCheckMojo extends AbstractMojo {
 	@Inject
 	private ArtifactChecker artifactChecker;
@@ -47,6 +54,8 @@ public class PGPSignatureCheckMojo extends AbstractMojo {
 	private AscArtifactResolver ascArtifactResolver;
 	@Inject
 	private DependenciesLocator dependenciesLocator;
+	@Inject
+	private KeyIdResolver pgpKeyIdResolver;
 	@Inject
 	private Logger logger;
 	/**
@@ -76,6 +85,12 @@ public class PGPSignatureCheckMojo extends AbstractMojo {
 	 */
 	@Parameter(defaultValue = "${project.basedir}/artifact-key-map.txt")
 	private String keyMapFileName;
+	/**
+	 * Indicates whether pom file (project artifact) signatures should be checked as
+	 * well.
+	 */
+	@Parameter(defaultValue = "true")
+	private boolean checkPomSignatures;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -83,12 +98,22 @@ public class PGPSignatureCheckMojo extends AbstractMojo {
 		try {
 			final Set<Artifact> filtered = dependenciesLocator.getArtifactsToVerify();
 			filtered.forEach(artifact -> {
-				final Artifact ascArtifact = ascArtifactResolver.resolveAscArtifact(artifact);
-				if (ascArtifact == null) {
-					throw new NoSignatureFileFoundException(artifact);
+				if (!pgpKeyIdResolver.isVerificationSkipped(artifact)) {
+					final String keyId = pgpKeyIdResolver.resolveKeyIdFor(artifact);
+					if (keyId == null) {
+						throw new MissingKeyMappingException(artifact);
+					}
+					final Artifact ascArtifact = ascArtifactResolver.resolveAscArtifact(artifact);
+					if (ascArtifact == null) {
+						throw new NoSignatureFileFoundException(artifact);
+					}
+					artifactChecker.check(artifact, ascArtifact, keyId);
+				} else {
+					logger.warn("check() per user request, skipping signature check on artifact:" + artifact);
 				}
-				artifactChecker.check(artifact, ascArtifact);
 			});
+		} catch (final SignatureCheckFailedException e) {
+			throw new MojoFailureException(e.getMessage(), e);
 		} catch (final Exception e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}

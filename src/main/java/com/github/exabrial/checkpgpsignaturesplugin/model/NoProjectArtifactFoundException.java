@@ -14,14 +14,14 @@
  * the License.
  */
 
-package com.github.exabrial.checkpgpsignaturesplugin.interfaces;
+package com.github.exabrial.checkpgpsignaturesplugin.model;
 
 import org.apache.maven.artifact.Artifact;
 
-public interface KeyIdResolver {
+public class NoProjectArtifactFoundException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
 
-	String resolveKeyIdFor(Artifact artifact);
-
-	boolean isVerificationSkipped(Artifact artifact);
-
+	public NoProjectArtifactFoundException(final Artifact artifact) {
+		super("No Project (pom file) artifact found for:" + artifact);
+	}
 }

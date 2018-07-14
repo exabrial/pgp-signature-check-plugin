@@ -17,17 +17,24 @@
 package com.github.exabrial.checkpgpsignaturesplugin.maven;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.anyCollection;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.ProjectDependenciesResolver;
+import javax.inject.Provider;
+
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.execution.MavenSession;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.repository.RepositorySystem;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -35,29 +42,43 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-@SuppressWarnings({ "deprecation" })
 public class MavenDependenciesLocatorTest {
 	@InjectMocks
 	private MavenDependenciesLocator mavenDependenciesLocator;
 	@Mock
-	private MavenSession mavenSession;
-	@Mock
 	private MavenProject mavenProject;
 	@Mock
-	private ProjectDependenciesResolver projectDependenciesResolver;
+	private RepositorySystem repositorySystem;
+	@Mock
+	private ArtifactRepository localRepository;
+	@Mock
+	private Provider<Boolean> checkPomSignatures;
+	@Mock
+	private List<ArtifactRepository> remoteRepositories;
+	@Mock
+	private ArtifactResolutionResult artifactResolutionResult;
+	private final Set<Artifact> artifacts = new HashSet<>(Arrays.asList(new Artifact[] { mock(Artifact.class) }));
+	private final Set<Artifact> pomArtifacts = new HashSet<>(Arrays.asList(new Artifact[] { mock(Artifact.class) }));
+
+	@Before
+	public void before() throws Exception {
+		when(mavenProject.getArtifacts()).thenReturn(artifacts);
+		when(artifactResolutionResult.getArtifacts()).thenReturn(pomArtifacts);
+		when(repositorySystem.resolve(any(ArtifactResolutionRequest.class))).thenReturn(artifactResolutionResult);
+	}
 
 	@Test
 	public void testGetArtifactsToVerify() throws Exception {
-		final HashSet<Artifact> expected = new HashSet<>();
-		when(projectDependenciesResolver.resolve(eq(mavenProject), anyCollection(), eq(mavenSession))).thenReturn(expected);
-		final Set<Artifact> artifactsToVerify = mavenDependenciesLocator.getArtifactsToVerify();
-		assertEquals(expected, artifactsToVerify);
+		when(checkPomSignatures.get()).thenReturn(true);
+		final HashSet<Object> combined = new HashSet<>();
+		combined.addAll(artifacts);
+		combined.addAll(pomArtifacts);
+		assertEquals(combined, mavenDependenciesLocator.getArtifactsToVerify());
 	}
 
-	@Test(expected = RuntimeException.class)
-	public void testGetArtifactsToVerify_err() throws Exception {
-		when(projectDependenciesResolver.resolve(eq(mavenProject), anyCollection(), eq(mavenSession)))
-				.thenThrow(new IllegalArgumentException());
-		mavenDependenciesLocator.getArtifactsToVerify();
+	@Test
+	public void testGetArtifactsToVerify_noPoms() throws Exception {
+		when(checkPomSignatures.get()).thenReturn(false);
+		assertEquals(artifacts, mavenDependenciesLocator.getArtifactsToVerify());
 	}
 }

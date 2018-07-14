@@ -45,6 +45,7 @@ import com.github.exabrial.checkpgpsignaturesplugin.model.InvalidPGPKeyIdExcepti
 public class MapFileKeyIdResolver implements KeyIdResolver {
 	private static final Pattern keyIdPattern = Pattern.compile("^0x[a-f0-9]{16,40}$", Pattern.CASE_INSENSITIVE);
 	private final Map<StrictPatternIncludesArtifactFilter, String> artifactKeyMap = new HashMap<>();
+	private final Map<StrictPatternIncludesArtifactFilter, String> artifactSkipMap = new HashMap<>();
 	@Inject
 	@Named("${keyMapFileName}")
 	private Provider<String> keyMapFileNameProvider;
@@ -75,18 +76,29 @@ public class MapFileKeyIdResolver implements KeyIdResolver {
 
 	@Override
 	public String resolveKeyIdFor(final Artifact artifact) {
-		final String keyId = artifactKeyMap.keySet().stream().filter(artifactPattern -> artifactPattern.include(artifact)).findAny()
+		final String keyId = artifactKeyMap.keySet().stream().filter(artifactPattern -> artifactPattern.include(artifact)).findFirst()
 				.map(artifactKeyMap::get).orElse(null);
 		logger.debug("resolveKeyIdFor() artifact:" + artifact + " mapped to keyId:" + keyId);
 		return keyId;
 	}
 
+	@Override
+	public boolean isVerificationSkipped(final Artifact artifact) {
+		final String keyId = artifactSkipMap.keySet().stream().filter(artifactPattern -> artifactPattern.include(artifact)).findFirst()
+				.map(artifactSkipMap::get).orElse(null);
+		return keyId != null;
+	}
+
 	private void parse(final String line) {
 		if (!line.equals("") && !line.startsWith("#")) {
 			final String[] values = line.split("=");
-			checkKeyId(values[1]);
 			final StrictPatternIncludesArtifactFilter filter = new StrictPatternIncludesArtifactFilter(Arrays.asList(values[0]));
-			artifactKeyMap.put(filter, values[1].substring(2));
+			if ("skip-signature-check".equals(values[1])) {
+				artifactSkipMap.put(filter, "skip-signature-check");
+			} else {
+				checkKeyId(values[1]);
+				artifactKeyMap.put(filter, values[1].substring(2));
+			}
 		}
 	}
 
