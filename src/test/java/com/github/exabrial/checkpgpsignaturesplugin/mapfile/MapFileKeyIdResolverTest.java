@@ -17,7 +17,9 @@
 package com.github.exabrial.checkpgpsignaturesplugin.mapfile;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -34,7 +36,6 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.Logger;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -70,7 +71,6 @@ public class MapFileKeyIdResolverTest {
 	private void insertBadLine() throws Exception {
 		FileUtils.writeStringToFile(new File(projectBaseDir, "artifact-key-map.txt"), "org.junit.*:*:*=0xNotAValidKeyId",
 				StandardCharsets.UTF_8, true);
-
 	}
 
 	@After
@@ -94,13 +94,6 @@ public class MapFileKeyIdResolverTest {
 		mapFileKeyIdResolver.postConstruct();
 	}
 
-	@Ignore
-	@Test(expected = RuntimeException.class)
-	public void testPostConstruct_ioe() throws Exception {
-		copyMapFile(null);
-		mapFileKeyIdResolver.postConstruct();
-	}
-
 	@Test
 	public void testResolveKeyIdFor_null() throws Exception {
 		copyMapFile(null);
@@ -115,5 +108,32 @@ public class MapFileKeyIdResolverTest {
 		copyMapFile(null);
 		insertBadLine();
 		mapFileKeyIdResolver.postConstruct();
+	}
+
+	@Test
+	public void testIsVerificationSkipped() throws Exception {
+		copyMapFile(null);
+		mapFileKeyIdResolver.postConstruct();
+		final Artifact artifact = new DefaultArtifact("org.junit.jupiter", "junit-jupiter-api", "5.2.0", "runtime", "jar", null,
+				mock(ArtifactHandler.class));
+		assertFalse(mapFileKeyIdResolver.isVerificationSkipped(artifact));
+	}
+
+	@Test
+	public void testIsVerificationSkipped_dontSkipMissing() throws Exception {
+		copyMapFile(null);
+		mapFileKeyIdResolver.postConstruct();
+		final Artifact artifact = new DefaultArtifact("DOESNOTEXIST", "DOESNOTEXIST", "5.2.0", "test", "jar", null,
+				mock(ArtifactHandler.class));
+		assertFalse(mapFileKeyIdResolver.isVerificationSkipped(artifact));
+	}
+
+	@Test
+	public void testIsVerificationSkipped_skipped() throws Exception {
+		copyMapFile(null);
+		mapFileKeyIdResolver.postConstruct();
+		final Artifact artifact = new DefaultArtifact("com.skip.me", "please", "5.2.0", "compile", "jar", null,
+				mock(ArtifactHandler.class));
+		assertTrue(mapFileKeyIdResolver.isVerificationSkipped(artifact));
 	}
 }
