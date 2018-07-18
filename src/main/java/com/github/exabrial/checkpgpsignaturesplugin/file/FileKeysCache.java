@@ -56,7 +56,7 @@ public class FileKeysCache implements KeysCache {
 
 	@PostConstruct
 	public void postConstruct() {
-		if (mojoProperties.getProperty("keyCacheDirectory") == null) {
+		if ("~/.m2/artifactPubKeys".equals(mojoProperties.getProperty("keyCacheDirectory"))) {
 			logger.debug("postConstruct() using keycache default directory");
 			final ProjectBuildingRequest projectBuildingRequest = mavenSession.getProjectBuildingRequest();
 			final File repoDirectory = repositoryManager.getLocalRepositoryBasedir(projectBuildingRequest);

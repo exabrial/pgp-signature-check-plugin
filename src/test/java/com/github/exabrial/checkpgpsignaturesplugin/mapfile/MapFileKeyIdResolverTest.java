@@ -31,7 +31,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,25 +55,14 @@ public class MapFileKeyIdResolverTest {
 	@Mock
 	private MojoProperties mojoProperties;
 	@Mock
-	private MavenProject project;
-	@Mock
 	private Logger logger;
 	private File projectBaseDir;
 
 	@BeforeEach
 	public void before() throws Exception {
 		projectBaseDir = Files.createTempDir();
-		when(project.getBasedir()).thenReturn(projectBaseDir);
-	}
-
-	private void copyMapFile(final String fileName) throws Exception {
-		FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/artifact-key-map.txt"),
-				new File(projectBaseDir, fileName != null ? fileName : "artifact-key-map.txt"));
-	}
-
-	private void insertBadLine() throws Exception {
-		FileUtils.writeStringToFile(new File(projectBaseDir, "artifact-key-map.txt"), "org.junit.*:*:*=0xNotAValidKeyId",
-				StandardCharsets.UTF_8, true);
+		final File mapFile = new File(projectBaseDir, "artifact-key-map.txt");
+		when(mojoProperties.getProperty("keyMapFileName")).thenReturn(mapFile.getAbsolutePath());
 	}
 
 	@AfterEach
@@ -82,11 +70,21 @@ public class MapFileKeyIdResolverTest {
 		FileUtils.deleteQuietly(projectBaseDir);
 	}
 
+	private String copyMapFile(final String fileName) throws Exception {
+		final File destination = new File(projectBaseDir, fileName != null ? fileName : "artifact-key-map.txt");
+		FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/artifact-key-map.txt"), destination);
+		return destination.getAbsolutePath();
+	}
+
+	private void insertBadLine() throws Exception {
+		FileUtils.writeStringToFile(new File(projectBaseDir, "artifact-key-map.txt"), "org.junit.*:*:*=0xNotAValidKeyId",
+				StandardCharsets.UTF_8, true);
+	}
+
 	@Test
 	public void testPostConstruct_suppliedName_testResolveKeyIdFor() throws Exception {
 		final String testFile = "TEST_FILE";
-		copyMapFile(testFile);
-		when(mojoProperties.getProperty("keyMapFileName")).thenReturn(testFile);
+		when(mojoProperties.getProperty("keyMapFileName")).thenReturn(copyMapFile(testFile));
 		mapFileKeyIdResolver.postConstruct();
 		final Artifact artifact = new DefaultArtifact("org.junit.jupiter", "junit-jupiter-api", "5.2.0", "test", "jar", null,
 				mock(ArtifactHandler.class));

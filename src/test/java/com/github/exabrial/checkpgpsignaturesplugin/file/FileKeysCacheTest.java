@@ -77,7 +77,7 @@ public class FileKeysCacheTest {
 
 	@Test
 	public void testPostConstruct() throws Exception {
-		when(mojoProperties.getProperty("keyCacheDirectory")).thenReturn(null);
+		when(mojoProperties.getProperty("keyCacheDirectory")).thenReturn("~/.m2/artifactPubKeys");
 		final ProjectBuildingRequest projectBuildingRequest = mock(ProjectBuildingRequest.class);
 		when(mavenSession.getProjectBuildingRequest()).thenReturn(projectBuildingRequest);
 		final File repoDirectory = new File(parentDirectory, "repository");
@@ -90,7 +90,7 @@ public class FileKeysCacheTest {
 
 	@Test
 	public void testPostConstruct_artifactPubKeysAlreadyExists() throws Exception {
-		when(mojoProperties.getProperty("keyCacheDirectory")).thenReturn(null);
+		when(mojoProperties.getProperty("keyCacheDirectory")).thenReturn("~/.m2/artifactPubKeys");
 		final ProjectBuildingRequest projectBuildingRequest = mock(ProjectBuildingRequest.class);
 		when(mavenSession.getProjectBuildingRequest()).thenReturn(projectBuildingRequest);
 		final File repoDirectory = new File(parentDirectory, "repository");

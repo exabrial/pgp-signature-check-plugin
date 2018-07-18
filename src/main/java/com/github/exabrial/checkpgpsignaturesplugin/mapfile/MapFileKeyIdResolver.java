@@ -32,7 +32,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.artifact.filter.StrictPatternIncludesArtifactFilter;
 import org.codehaus.plexus.logging.Logger;
 
@@ -49,17 +48,12 @@ public class MapFileKeyIdResolver implements KeyIdResolver {
 	@Inject
 	private MojoProperties mojoProperties;
 	@Inject
-	private MavenProject project;
-	@Inject
 	private Logger logger;
 
 	@PostConstruct
 	void postConstruct() {
-		String keyMapFileName = mojoProperties.getProperty("keyMapFileName");
-		if (keyMapFileName == null) {
-			keyMapFileName = "artifact-key-map.txt";
-		}
-		final File keyMapFile = new File(project.getBasedir(), keyMapFileName);
+		final String keyMapFileName = mojoProperties.getProperty("keyMapFileName");
+		final File keyMapFile = new File(keyMapFileName);
 		if (!keyMapFile.exists()) {
 			throw new MissingKeyMapFileException(keyMapFile);
 		} else {
