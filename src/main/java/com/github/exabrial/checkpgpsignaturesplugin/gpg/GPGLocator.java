@@ -19,7 +19,6 @@ package com.github.exabrial.checkpgpsignaturesplugin.gpg;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.codehaus.plexus.logging.Logger;
@@ -30,21 +29,21 @@ import com.github.exabrial.checkpgpsignaturesplugin.model.CantFindGPGException;
 
 @Named
 @Singleton
-public class GPGExecutable {
+public class GPGLocator {
 	@Inject
 	private Logger logger;
 	@Inject
 	private CommandExecutor commandExecutor;
 	@Inject
+	@org.eclipse.sisu.Nullable
 	@Named("${gpgExecutable}")
-	private Provider<String> gpgExecutableProvider;
 	private String gpgExecutable;
 
 	@PostConstruct
 	public void postConstruct() {
 		final Commandline cmd = new Commandline();
-		if ((gpgExecutable = gpgExecutableProvider.get()) == null) {
-			if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+		if (gpgExecutable == null) {
+			if (isWindows()) {
 				cmd.setExecutable("where.exe");
 				cmd.createArg().setValue("gpg.exe");
 			} else {
@@ -55,13 +54,24 @@ public class GPGExecutable {
 			if (result.exitCode != 0) {
 				throw new CantFindGPGException(result);
 			} else {
-				gpgExecutable = result.output;
+				gpgExecutable = result.output.trim();
 			}
 		}
 		logger.info("postConstruct() using gpgExecutable:" + gpgExecutable);
 	}
 
+	boolean isWindows() {
+		return Os.isFamily(Os.FAMILY_WINDOWS);
+	}
+
 	public String getGPGExecutable() {
-		return gpgExecutable;
+		return gpgExecutable.toString();
+	}
+
+	/**
+	 * Just for testing :( Need a better way
+	 */
+	void setGpgExecutable(final String gpgExecutable) {
+		this.gpgExecutable = gpgExecutable;
 	}
 }

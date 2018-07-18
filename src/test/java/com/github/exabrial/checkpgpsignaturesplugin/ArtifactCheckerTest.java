@@ -16,6 +16,7 @@
 
 package com.github.exabrial.checkpgpsignaturesplugin;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -28,18 +29,19 @@ import java.io.IOException;
 
 import org.apache.maven.artifact.Artifact;
 import org.codehaus.plexus.logging.Logger;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeyRetriever;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeysCache;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.SignatureChecker;
 import com.github.exabrial.checkpgpsignaturesplugin.model.PGPKey;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ArtifactCheckerTest {
 	@InjectMocks
 	private ArtifactChecker artifactChecker;
@@ -76,11 +78,14 @@ public class ArtifactCheckerTest {
 		verifyZeroInteractions(pgpKeyRetriever);
 	}
 
-	@Test(expected = RuntimeException.class)
+	@Test
 	public void testCheck_ioeOnPut() throws Exception {
-		final PGPKey pgpKey = mock(PGPKey.class);
-		when(pgpKeyRetriever.retrieveKey(keyId)).thenReturn(pgpKey);
-		when(pgpKeysCache.put(pgpKey)).thenThrow(new IOException());
-		artifactChecker.check(artifact, signature, keyId);
+		final Executable executable = () -> {
+			final PGPKey pgpKey = mock(PGPKey.class);
+			when(pgpKeyRetriever.retrieveKey(keyId)).thenReturn(pgpKey);
+			when(pgpKeysCache.put(pgpKey)).thenThrow(new IOException());
+			artifactChecker.check(artifact, signature, keyId);
+		};
+		assertThrows(RuntimeException.class, executable);
 	}
 }

@@ -16,7 +16,8 @@
 
 package com.github.exabrial.checkpgpsignaturesplugin.maven;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -34,16 +35,17 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.github.exabrial.checkpgpsignaturesplugin.model.NoProjectArtifactFoundException;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class MavenDependenciesLocatorTest {
 	@InjectMocks
 	private MavenDependenciesLocator mavenDependenciesLocator;
@@ -62,9 +64,12 @@ public class MavenDependenciesLocatorTest {
 	private final Set<Artifact> artifacts = new HashSet<>(Arrays.asList(new Artifact[] { mock(Artifact.class) }));
 	private final Set<Artifact> pomArtifacts = new HashSet<>(Arrays.asList(new Artifact[] { mock(Artifact.class) }));
 
-	@Before
+	@BeforeEach
 	public void before() throws Exception {
 		when(mavenProject.getArtifacts()).thenReturn(artifacts);
+	}
+
+	private void mockRepo() {
 		when(artifactResolutionResult.getArtifacts()).thenReturn(pomArtifacts);
 		when(repositorySystem.resolve(any(ArtifactResolutionRequest.class))).thenReturn(artifactResolutionResult);
 	}
@@ -72,6 +77,7 @@ public class MavenDependenciesLocatorTest {
 	@Test
 	public void testGetArtifactsToVerify() throws Exception {
 		when(checkPomSignatures.get()).thenReturn(true);
+		mockRepo();
 		final HashSet<Object> combined = new HashSet<>();
 		combined.addAll(artifacts);
 		combined.addAll(pomArtifacts);
@@ -84,10 +90,14 @@ public class MavenDependenciesLocatorTest {
 		assertEquals(artifacts, mavenDependenciesLocator.getArtifactsToVerify());
 	}
 
-	@Test(expected = NoProjectArtifactFoundException.class)
+	@Test
 	public void testGetArtifactsToVerify_missingProject() throws Exception {
-		when(checkPomSignatures.get()).thenReturn(true);
-		when(artifactResolutionResult.getArtifacts()).thenReturn(new HashSet<>());
-		mavenDependenciesLocator.getArtifactsToVerify();
+		final Executable executable = () -> {
+			mockRepo();
+			when(checkPomSignatures.get()).thenReturn(true);
+			when(artifactResolutionResult.getArtifacts()).thenReturn(new HashSet<>());
+			mavenDependenciesLocator.getArtifactsToVerify();
+		};
+		assertThrows(NoProjectArtifactFoundException.class, executable);
 	}
 }

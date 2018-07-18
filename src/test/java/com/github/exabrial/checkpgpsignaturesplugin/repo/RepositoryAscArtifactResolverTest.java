@@ -16,8 +16,8 @@
 
 package com.github.exabrial.checkpgpsignaturesplugin.repo;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
@@ -31,14 +31,14 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class RepositoryAscArtifactResolverTest {
 	@InjectMocks
 	private RepositoryAscArtifactResolver repositoryAscArtifactResolver;
@@ -53,7 +53,7 @@ public class RepositoryAscArtifactResolverTest {
 	@Mock
 	private Artifact artifact;
 
-	@Before
+	@BeforeEach
 	public void before() {
 		final MavenExecutionRequest mavenExecutionRequest = mock(MavenExecutionRequest.class);
 		when(session.getRequest()).thenReturn(mavenExecutionRequest);

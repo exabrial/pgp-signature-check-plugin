@@ -16,74 +16,84 @@
 
 package com.github.exabrial.checkpgpsignaturesplugin.gpg;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import javax.inject.Provider;
-
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.cli.Commandline;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.github.exabrial.checkpgpsignaturesplugin.model.CantFindGPGException;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Os.class)
-public class GPGExecutableTest {
+@ExtendWith(MockitoExtension.class)
+public class GPGLocatorTest {
 	@InjectMocks
-	private GPGExecutable gpgExecutable;
+	private TestGPGLocator gpgLocator;
 	@Mock
 	private CommandExecutor commandExecutor;
 	@Mock
 	private Logger logger;
-	@Mock
-	private Provider<String> gpgExecutableProvider;
 
 	@Test
 	public void testPostConstruct_unix() {
 		final String whichCommandOutput = "woot2";
 		final ExecutionResult result = new ExecutionResult(0, whichCommandOutput);
-		PowerMockito.spy(Os.class);
 		when(commandExecutor.execute(any(Commandline.class))).thenReturn(result);
-		PowerMockito.when(Os.isFamily(Os.FAMILY_WINDOWS)).thenReturn(false);
-		gpgExecutable.postConstruct();
-		assertEquals(whichCommandOutput, gpgExecutable.getGPGExecutable());
+		gpgLocator.postConstruct();
+		assertEquals(whichCommandOutput, gpgLocator.getGPGExecutable());
 	}
 
 	@Test
 	public void testPostConstruct_windows() {
 		final String whichCommandOutput = "woot3";
 		final ExecutionResult result = new ExecutionResult(0, whichCommandOutput);
-		PowerMockito.spy(Os.class);
 		when(commandExecutor.execute(any(Commandline.class))).thenReturn(result);
-		PowerMockito.when(Os.isFamily(Os.FAMILY_WINDOWS)).thenReturn(true);
-		gpgExecutable.postConstruct();
-		assertEquals(whichCommandOutput, gpgExecutable.getGPGExecutable());
+		gpgLocator.windows = false;
+		gpgLocator.postConstruct();
+		assertEquals(whichCommandOutput, gpgLocator.getGPGExecutable());
 	}
 
 	@Test
 	public void testPostConstruct_provideGpgExecutable() {
 		final String gpgExectuable = "YEE YEE - Earl Dibbles Jr";
-		when(gpgExecutableProvider.get()).thenReturn(gpgExectuable);
-		gpgExecutable.postConstruct();
+		gpgLocator.setGpgExecutable(gpgExectuable);
+		gpgLocator.postConstruct();
 		verifyZeroInteractions(commandExecutor);
-		assertEquals(gpgExectuable, gpgExecutable.getGPGExecutable());
+		assertEquals(gpgExectuable, gpgLocator.getGPGExecutable());
 	}
 
-	@Test(expected = CantFindGPGException.class)
+	@Test
 	public void testPostConstruct_missingGpg() {
-		final String whichCommandOutput = "";
-		final ExecutionResult result = new ExecutionResult(1, whichCommandOutput);
-		when(commandExecutor.execute(any(Commandline.class))).thenReturn(result);
-		gpgExecutable.postConstruct();
+		final Executable executable = () -> {
+			final String whichCommandOutput = "";
+			final ExecutionResult result = new ExecutionResult(1, whichCommandOutput);
+			when(commandExecutor.execute(any(Commandline.class))).thenReturn(result);
+			gpgLocator.postConstruct();
+		};
+		assertThrows(CantFindGPGException.class, executable);
+	}
+
+	/**
+	 * Not proud of testing this way. Static methods are hell.
+	 */
+	private static class TestGPGLocator extends GPGLocator {
+		private Boolean windows;
+
+		@Override
+		boolean isWindows() {
+			if (windows == null) {
+				return super.isWindows();
+			} else {
+				return windows;
+			}
+		}
 	}
 }
