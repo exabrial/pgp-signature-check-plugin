@@ -22,7 +22,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.maven.artifact.Artifact;
@@ -33,6 +32,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
 
+import com.github.exabrial.checkpgpsignaturesplugin.MojoProperties;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.DependenciesLocator;
 import com.github.exabrial.checkpgpsignaturesplugin.model.NoProjectArtifactFoundException;
 
@@ -48,13 +48,12 @@ public class MavenDependenciesLocator implements DependenciesLocator {
 	@Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true)
 	private List<ArtifactRepository> remoteRepositories;
 	@Inject
-	@Named("${checkPomSignatures:-true}")
-	private Provider<Boolean> checkPomSignatures;
+	private MojoProperties mojoProperties;
 
 	@Override
 	public Set<Artifact> getArtifactsToVerify() {
 		final Set<Artifact> artifacts = mavenProject.getArtifacts();
-		if (checkPomSignatures.get()) {
+		if ("true".equalsIgnoreCase(mojoProperties.getProperty("checkPomSignatures"))) {
 			artifacts.addAll(getPomArtifacts(artifacts));
 		}
 		return artifacts;

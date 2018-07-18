@@ -56,6 +56,8 @@ public class PGPSignatureCheckMojoTest {
 	@Mock
 	private KeyIdResolver pgpKeyIdResolver;
 	@Mock
+	private MojoProperties mojoProperties;
+	@Mock
 	private Logger logger;
 	private final String keyId = "keyId0";
 

@@ -25,6 +25,7 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.cli.Commandline;
 
+import com.github.exabrial.checkpgpsignaturesplugin.MojoProperties;
 import com.github.exabrial.checkpgpsignaturesplugin.model.CantFindGPGException;
 
 @Named
@@ -35,14 +36,13 @@ public class GPGLocator {
 	@Inject
 	private CommandExecutor commandExecutor;
 	@Inject
-	@org.eclipse.sisu.Nullable
-	@Named("${gpgExecutable}")
+	private MojoProperties mojoProperties;
 	private String gpgExecutable;
 
 	@PostConstruct
 	public void postConstruct() {
 		final Commandline cmd = new Commandline();
-		if (gpgExecutable == null) {
+		if ((gpgExecutable = mojoProperties.getProperty("gpgExecutable")) == null) {
 			if (isWindows()) {
 				cmd.setExecutable("where.exe");
 				cmd.createArg().setValue("gpg.exe");
@@ -60,18 +60,14 @@ public class GPGLocator {
 		logger.info("postConstruct() using gpgExecutable:" + gpgExecutable);
 	}
 
+	/**
+	 * Static methods are the death of testing :(
+	 */
 	boolean isWindows() {
 		return Os.isFamily(Os.FAMILY_WINDOWS);
 	}
 
 	public String getGPGExecutable() {
 		return gpgExecutable.toString();
-	}
-
-	/**
-	 * Just for testing :( Need a better way
-	 */
-	void setGpgExecutable(final String gpgExecutable) {
-		this.gpgExecutable = gpgExecutable;
 	}
 }

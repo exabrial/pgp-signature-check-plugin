@@ -29,8 +29,6 @@ import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
 
-import javax.inject.Provider;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -45,6 +43,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.github.exabrial.checkpgpsignaturesplugin.MojoProperties;
 import com.github.exabrial.checkpgpsignaturesplugin.model.PGPKey;
 import com.google.common.io.Files;
 
@@ -59,7 +58,7 @@ public class FileKeysCacheTest {
 	@Mock
 	private MavenSession mavenSession;
 	@Mock
-	private Provider<String> keyCacheDirectory;
+	private MojoProperties mojoProperties;
 
 	private File parentDirectory;
 	private String parentDirectoryName;
@@ -68,7 +67,7 @@ public class FileKeysCacheTest {
 	public void before() {
 		parentDirectory = Files.createTempDir();
 		parentDirectoryName = parentDirectory.getAbsolutePath();
-		when(keyCacheDirectory.get()).thenReturn(parentDirectoryName);
+		when(mojoProperties.getProperty("keyCacheDirectory")).thenReturn(parentDirectoryName);
 	}
 
 	@AfterEach
@@ -78,7 +77,7 @@ public class FileKeysCacheTest {
 
 	@Test
 	public void testPostConstruct() throws Exception {
-		when(keyCacheDirectory.get()).thenReturn(null);
+		when(mojoProperties.getProperty("keyCacheDirectory")).thenReturn(null);
 		final ProjectBuildingRequest projectBuildingRequest = mock(ProjectBuildingRequest.class);
 		when(mavenSession.getProjectBuildingRequest()).thenReturn(projectBuildingRequest);
 		final File repoDirectory = new File(parentDirectory, "repository");
@@ -91,7 +90,7 @@ public class FileKeysCacheTest {
 
 	@Test
 	public void testPostConstruct_artifactPubKeysAlreadyExists() throws Exception {
-		when(keyCacheDirectory.get()).thenReturn(null);
+		when(mojoProperties.getProperty("keyCacheDirectory")).thenReturn(null);
 		final ProjectBuildingRequest projectBuildingRequest = mock(ProjectBuildingRequest.class);
 		when(mavenSession.getProjectBuildingRequest()).thenReturn(projectBuildingRequest);
 		final File repoDirectory = new File(parentDirectory, "repository");

@@ -31,12 +31,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.github.exabrial.checkpgpsignaturesplugin.MojoProperties;
 import com.github.exabrial.checkpgpsignaturesplugin.model.CantFindGPGException;
 
 @ExtendWith(MockitoExtension.class)
 public class GPGLocatorTest {
 	@InjectMocks
 	private TestGPGLocator gpgLocator;
+	@Mock
+	private MojoProperties mojoProperties;
 	@Mock
 	private CommandExecutor commandExecutor;
 	@Mock
@@ -63,11 +66,11 @@ public class GPGLocatorTest {
 
 	@Test
 	public void testPostConstruct_provideGpgExecutable() {
-		final String gpgExectuable = "YEE YEE - Earl Dibbles Jr";
-		gpgLocator.setGpgExecutable(gpgExectuable);
+		final String gpgExecutable = "YEE YEE - Earl Dibbles Jr";
+		when(mojoProperties.getProperty("gpgExecutable")).thenReturn(gpgExecutable);
 		gpgLocator.postConstruct();
 		verifyZeroInteractions(commandExecutor);
-		assertEquals(gpgExectuable, gpgLocator.getGPGExecutable());
+		assertEquals(gpgExecutable, gpgLocator.getGPGExecutable());
 	}
 
 	@Test

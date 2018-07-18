@@ -27,8 +27,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Provider;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
@@ -43,6 +41,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.github.exabrial.checkpgpsignaturesplugin.MojoProperties;
 import com.github.exabrial.checkpgpsignaturesplugin.model.NoProjectArtifactFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -56,11 +55,11 @@ public class MavenDependenciesLocatorTest {
 	@Mock
 	private ArtifactRepository localRepository;
 	@Mock
-	private Provider<Boolean> checkPomSignatures;
-	@Mock
 	private List<ArtifactRepository> remoteRepositories;
 	@Mock
 	private ArtifactResolutionResult artifactResolutionResult;
+	@Mock
+	private MojoProperties mojoProperties;
 	private final Set<Artifact> artifacts = new HashSet<>(Arrays.asList(new Artifact[] { mock(Artifact.class) }));
 	private final Set<Artifact> pomArtifacts = new HashSet<>(Arrays.asList(new Artifact[] { mock(Artifact.class) }));
 
@@ -76,7 +75,7 @@ public class MavenDependenciesLocatorTest {
 
 	@Test
 	public void testGetArtifactsToVerify() throws Exception {
-		when(checkPomSignatures.get()).thenReturn(true);
+		when(mojoProperties.getProperty("checkPomSignatures")).thenReturn(String.valueOf(true));
 		mockRepo();
 		final HashSet<Object> combined = new HashSet<>();
 		combined.addAll(artifacts);
@@ -86,7 +85,7 @@ public class MavenDependenciesLocatorTest {
 
 	@Test
 	public void testGetArtifactsToVerify_noPoms() throws Exception {
-		when(checkPomSignatures.get()).thenReturn(false);
+		when(mojoProperties.getProperty("checkPomSignatures")).thenReturn(String.valueOf(false));
 		assertEquals(artifacts, mavenDependenciesLocator.getArtifactsToVerify());
 	}
 
@@ -94,7 +93,7 @@ public class MavenDependenciesLocatorTest {
 	public void testGetArtifactsToVerify_missingProject() throws Exception {
 		final Executable executable = () -> {
 			mockRepo();
-			when(checkPomSignatures.get()).thenReturn(true);
+			when(mojoProperties.getProperty("checkPomSignatures")).thenReturn(String.valueOf(true));
 			when(artifactResolutionResult.getArtifacts()).thenReturn(new HashSet<>());
 			mavenDependenciesLocator.getArtifactsToVerify();
 		};

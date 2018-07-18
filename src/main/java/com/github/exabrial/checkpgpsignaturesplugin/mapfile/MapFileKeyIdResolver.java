@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.maven.artifact.Artifact;
@@ -37,6 +36,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.artifact.filter.StrictPatternIncludesArtifactFilter;
 import org.codehaus.plexus.logging.Logger;
 
+import com.github.exabrial.checkpgpsignaturesplugin.MojoProperties;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeyIdResolver;
 import com.github.exabrial.checkpgpsignaturesplugin.model.InvalidPGPKeyIdException;
 
@@ -47,8 +47,7 @@ public class MapFileKeyIdResolver implements KeyIdResolver {
 	private final Map<StrictPatternIncludesArtifactFilter, String> artifactKeyMap = new HashMap<>();
 	private final Map<StrictPatternIncludesArtifactFilter, String> artifactSkipMap = new HashMap<>();
 	@Inject
-	@Named("${keyMapFileName}")
-	private Provider<String> keyMapFileNameProvider;
+	private MojoProperties mojoProperties;
 	@Inject
 	private MavenProject project;
 	@Inject
@@ -56,7 +55,7 @@ public class MapFileKeyIdResolver implements KeyIdResolver {
 
 	@PostConstruct
 	void postConstruct() {
-		String keyMapFileName = keyMapFileNameProvider.get();
+		String keyMapFileName = mojoProperties.getProperty("keyMapFileName");
 		if (keyMapFileName == null) {
 			keyMapFileName = "artifact-key-map.txt";
 		}
