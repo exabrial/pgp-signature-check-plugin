@@ -82,6 +82,10 @@ public class PGPSignatureCheckMojo extends AbstractMojo {
 	 * </p>
 	 * Wildcards are allowed. All lines are trimmed. Comments begin the # [hash]
 	 * character.
+	 * <p>
+	 * To skip a particular artifact, set the value to: `skip-signature-check`
+	 * </p>
+	 * groupId:artifactId:version=skip-signature-check
 	 */
 	@Parameter(defaultValue = "${project.basedir}/artifact-key-map.txt")
 	private String keyMapFileName;
