@@ -16,10 +16,11 @@
 
 package com.github.exabrial.checkpgpsignaturesplugin.file;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,25 +29,25 @@ import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
 
-import javax.inject.Provider;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.repository.RepositoryManager;
 import org.codehaus.plexus.logging.Logger;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.github.exabrial.checkpgpsignaturesplugin.MojoProperties;
 import com.github.exabrial.checkpgpsignaturesplugin.model.PGPKey;
 import com.google.common.io.Files;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class FileKeysCacheTest {
 	@InjectMocks
 	private FileKeysCache fileKeysCache;
@@ -57,26 +58,26 @@ public class FileKeysCacheTest {
 	@Mock
 	private MavenSession mavenSession;
 	@Mock
-	private Provider<String> keyCacheDirectory;
+	private MojoProperties mojoProperties;
 
 	private File parentDirectory;
 	private String parentDirectoryName;
 
-	@Before
+	@BeforeEach
 	public void before() {
 		parentDirectory = Files.createTempDir();
 		parentDirectoryName = parentDirectory.getAbsolutePath();
-		when(keyCacheDirectory.get()).thenReturn(parentDirectoryName);
+		when(mojoProperties.getProperty("keyCacheDirectory")).thenReturn(parentDirectoryName);
 	}
 
-	@After
+	@AfterEach
 	public void after() {
 		FileUtils.deleteQuietly(new File(parentDirectoryName));
 	}
 
 	@Test
 	public void testPostConstruct() throws Exception {
-		when(keyCacheDirectory.get()).thenReturn(null);
+		when(mojoProperties.getProperty("keyCacheDirectory")).thenReturn("~/.m2/artifactPubKeys");
 		final ProjectBuildingRequest projectBuildingRequest = mock(ProjectBuildingRequest.class);
 		when(mavenSession.getProjectBuildingRequest()).thenReturn(projectBuildingRequest);
 		final File repoDirectory = new File(parentDirectory, "repository");
@@ -89,7 +90,7 @@ public class FileKeysCacheTest {
 
 	@Test
 	public void testPostConstruct_artifactPubKeysAlreadyExists() throws Exception {
-		when(keyCacheDirectory.get()).thenReturn(null);
+		when(mojoProperties.getProperty("keyCacheDirectory")).thenReturn("~/.m2/artifactPubKeys");
 		final ProjectBuildingRequest projectBuildingRequest = mock(ProjectBuildingRequest.class);
 		when(mavenSession.getProjectBuildingRequest()).thenReturn(projectBuildingRequest);
 		final File repoDirectory = new File(parentDirectory, "repository");
@@ -108,11 +109,14 @@ public class FileKeysCacheTest {
 		verify(logger).info("postConstruct() using existing keyCacheDirectory:" + parentDirectory.getAbsolutePath());
 	}
 
-	@Test(expected = UserSpecifiedKeyCacheDirectoryDoesntExistException.class)
+	@Test
 	public void testPostConstruct_specificDoesntExist() throws Exception {
-		parentDirectory.delete();
-		assertFalse(new File(parentDirectoryName).exists());
-		fileKeysCache.postConstruct();
+		final Executable executable = () -> {
+			parentDirectory.delete();
+			assertFalse(new File(parentDirectoryName).exists());
+			fileKeysCache.postConstruct();
+		};
+		assertThrows(UserSpecifiedKeyCacheDirectoryDoesntExistException.class, executable);
 	}
 
 	@Test

@@ -29,14 +29,13 @@ import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.artifact.filter.StrictPatternIncludesArtifactFilter;
 import org.codehaus.plexus.logging.Logger;
 
+import com.github.exabrial.checkpgpsignaturesplugin.MojoProperties;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeyIdResolver;
 import com.github.exabrial.checkpgpsignaturesplugin.model.InvalidPGPKeyIdException;
 
@@ -45,21 +44,16 @@ import com.github.exabrial.checkpgpsignaturesplugin.model.InvalidPGPKeyIdExcepti
 public class MapFileKeyIdResolver implements KeyIdResolver {
 	private static final Pattern keyIdPattern = Pattern.compile("^0x[a-f0-9]{16,40}$", Pattern.CASE_INSENSITIVE);
 	private final Map<StrictPatternIncludesArtifactFilter, String> artifactKeyMap = new HashMap<>();
+	private final Map<StrictPatternIncludesArtifactFilter, String> artifactSkipMap = new HashMap<>();
 	@Inject
-	@Named("${keyMapFileName}")
-	private Provider<String> keyMapFileNameProvider;
-	@Inject
-	private MavenProject project;
+	private MojoProperties mojoProperties;
 	@Inject
 	private Logger logger;
 
 	@PostConstruct
 	void postConstruct() {
-		String keyMapFileName = keyMapFileNameProvider.get();
-		if (keyMapFileName == null) {
-			keyMapFileName = "artifact-key-map.txt";
-		}
-		final File keyMapFile = new File(project.getBasedir(), keyMapFileName);
+		final String keyMapFileName = mojoProperties.getProperty("keyMapFileName");
+		final File keyMapFile = new File(keyMapFileName);
 		if (!keyMapFile.exists()) {
 			throw new MissingKeyMapFileException(keyMapFile);
 		} else {
@@ -75,18 +69,29 @@ public class MapFileKeyIdResolver implements KeyIdResolver {
 
 	@Override
 	public String resolveKeyIdFor(final Artifact artifact) {
-		final String keyId = artifactKeyMap.keySet().stream().filter(artifactPattern -> artifactPattern.include(artifact)).findAny()
+		final String keyId = artifactKeyMap.keySet().stream().filter(artifactPattern -> artifactPattern.include(artifact)).findFirst()
 				.map(artifactKeyMap::get).orElse(null);
 		logger.debug("resolveKeyIdFor() artifact:" + artifact + " mapped to keyId:" + keyId);
 		return keyId;
 	}
 
+	@Override
+	public boolean isVerificationSkipped(final Artifact artifact) {
+		final String keyId = artifactSkipMap.keySet().stream().filter(artifactPattern -> artifactPattern.include(artifact)).findFirst()
+				.map(artifactSkipMap::get).orElse(null);
+		return keyId != null;
+	}
+
 	private void parse(final String line) {
 		if (!line.equals("") && !line.startsWith("#")) {
 			final String[] values = line.split("=");
-			checkKeyId(values[1]);
 			final StrictPatternIncludesArtifactFilter filter = new StrictPatternIncludesArtifactFilter(Arrays.asList(values[0]));
-			artifactKeyMap.put(filter, values[1].substring(2));
+			if ("skip-signature-check".equals(values[1])) {
+				artifactSkipMap.put(filter, "skip-signature-check");
+			} else {
+				checkKeyId(values[1]);
+				artifactKeyMap.put(filter, values[1].substring(2));
+			}
 		}
 	}
 

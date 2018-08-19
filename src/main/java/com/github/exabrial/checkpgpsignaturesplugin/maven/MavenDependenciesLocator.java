@@ -16,7 +16,7 @@
 
 package com.github.exabrial.checkpgpsignaturesplugin.maven;
 
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -24,34 +24,60 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.ProjectDependenciesResolver;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.execution.MavenSession;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.repository.RepositorySystem;
 
+import com.github.exabrial.checkpgpsignaturesplugin.MojoProperties;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.DependenciesLocator;
+import com.github.exabrial.checkpgpsignaturesplugin.model.NoProjectArtifactFoundException;
 
 @Named
 @Singleton
-@SuppressWarnings("deprecation")
 public class MavenDependenciesLocator implements DependenciesLocator {
 	@Inject
-	private MavenSession mavenSession;
-	@Inject
 	private MavenProject mavenProject;
-	// TODO This is deprecated, need a replacement
 	@Inject
-	private ProjectDependenciesResolver projectDependenciesResolver;
+	private RepositorySystem repositorySystem;
+	@Parameter(defaultValue = "${localRepository}", readonly = true)
+	private ArtifactRepository localRepository;
+	@Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true)
+	private List<ArtifactRepository> remoteRepositories;
+	@Inject
+	private MojoProperties mojoProperties;
 
 	@Override
 	public Set<Artifact> getArtifactsToVerify() {
-		try {
-			// TODO Make this a mojo option
-			final List<String> scopes = Arrays.asList(new String[] { "compile", "runtime", "test" });
-			final Set<Artifact> artifacts = projectDependenciesResolver.resolve(mavenProject, scopes, mavenSession);
-			return artifacts;
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
+		final Set<Artifact> artifacts = mavenProject.getArtifacts();
+		if ("true".equalsIgnoreCase(mojoProperties.getProperty("checkPomSignatures"))) {
+			artifacts.addAll(getPomArtifacts(artifacts));
 		}
+		return artifacts;
+	}
+
+	private Set<Artifact> getPomArtifacts(final Set<Artifact> artifacts) {
+		final Set<Artifact> poms = new HashSet<>();
+		for (final Artifact artifact : artifacts) {
+			final ArtifactResolutionRequest artifactResolutionRequest = createArtifactResolutionRequestForPom(artifact);
+			final ArtifactResolutionResult artifactResolutionResult = repositorySystem.resolve(artifactResolutionRequest);
+			poms.add(
+					artifactResolutionResult.getArtifacts().stream().findAny().orElseThrow(() -> new NoProjectArtifactFoundException(artifact)));
+		}
+		return poms;
+	}
+
+	private ArtifactResolutionRequest createArtifactResolutionRequestForPom(final Artifact artifact) {
+		final Artifact projectArtifact = repositorySystem.createProjectArtifact(artifact.getGroupId(), artifact.getArtifactId(),
+				artifact.getVersion());
+		final ArtifactResolutionRequest artifactResolutionRequest = new ArtifactResolutionRequest();
+		artifactResolutionRequest.setArtifact(projectArtifact);
+		artifactResolutionRequest.setResolveTransitively(false);
+		artifactResolutionRequest.setLocalRepository(localRepository);
+		artifactResolutionRequest.setRemoteRepositories(remoteRepositories);
+		return artifactResolutionRequest;
 	}
 }

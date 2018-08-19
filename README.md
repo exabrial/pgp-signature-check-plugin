@@ -35,5 +35,8 @@ You'll need Java8, a `~/.m2/toolchains.xml`[file](../master/support-files/toolch
 #### gh-pages
 
 * `mvn clean install -P gh-pages`
-* Builds and deploys the public facing website
+* Builds the public facing website. Override the sysprop: * `mvn clean install -P gh-pages -Dgithub.site.skip=false` to actually deploy. You must have a server setup in `settings.xml` to do this of course.
 
+#### eclipse
+
+* Adds the eclipse junit5 provider to the classpath

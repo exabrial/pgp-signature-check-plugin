@@ -40,7 +40,7 @@ public class GPGKeyRetriever implements KeyRetriever {
 	@Inject
 	private CommandExecutor commandExecutor;
 	@Inject
-	private GPGExecutable gpgExecutable;
+	private GPGLocator gpgLocator;
 	@Inject
 	private Logger logger;
 
@@ -48,10 +48,10 @@ public class GPGKeyRetriever implements KeyRetriever {
 	public PGPKey retrieveKey(final String keyId) {
 		logger.info("retrieveKey() fetching keyId:" + keyId);
 		try {
-			final File tempKeyFile = File.createTempFile(keyId, "kbx");
+			final File tempKeyFile = createTempFile(keyId);
 			try {
 				final Commandline cmd = new Commandline();
-				cmd.setExecutable(gpgExecutable.getGPGExecutable());
+				cmd.setExecutable(gpgLocator.getGPGExecutable());
 				cmd.createArg().setValue("--verbose");
 				cmd.createArg().setValue("--recv-keys");
 				cmd.createArg().setValue("--no-default-keyring");
@@ -75,5 +75,10 @@ public class GPGKeyRetriever implements KeyRetriever {
 		} catch (final IOException e) {
 			throw new CouldntRetrieveKeyException(e);
 		}
+	}
+
+	File createTempFile(final String keyId) throws IOException {
+		final File tempKeyFile = File.createTempFile(keyId, "kbx");
+		return tempKeyFile;
 	}
 }

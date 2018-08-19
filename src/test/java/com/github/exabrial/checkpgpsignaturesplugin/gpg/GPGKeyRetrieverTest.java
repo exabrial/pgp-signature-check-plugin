@@ -16,65 +16,86 @@
 
 package com.github.exabrial.checkpgpsignaturesplugin.gpg;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.cli.Commandline;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.github.exabrial.checkpgpsignaturesplugin.model.CouldntRetrieveKeyException;
 import com.github.exabrial.checkpgpsignaturesplugin.model.PGPKey;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(FileUtils.class)
+@ExtendWith(MockitoExtension.class)
 public class GPGKeyRetrieverTest {
 	@InjectMocks
-	private GPGKeyRetriever gpgKeyRetriever;
+	private TestGPGKeyRetriever gpgKeyRetriever;
 	@Mock
 	private CommandExecutor commandExecutor;
 	@Mock
-	private GPGExecutable gpgExecutable;
+	private GPGLocator gpgExecutable;
 	@Mock
 	private Logger logger;
 	private final String keyId = "871638A21A7F2C38066471420306A354336B4F0D";
+	private static final byte[] keyBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
 
 	@Test
 	public void testRetrieveKey() throws Exception {
 		final ExecutionResult result = new ExecutionResult(0, "got said key");
 		when(commandExecutor.execute(any(Commandline.class))).thenReturn(result);
-		final byte[] keyBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
-		PowerMockito.mockStatic(FileUtils.class);
-		PowerMockito.when(FileUtils.readFileToByteArray(any(File.class))).thenReturn(keyBytes);
 		final PGPKey pgpKey = gpgKeyRetriever.retrieveKey(keyId);
 		assertEquals(keyId, pgpKey.keyId);
-		assertEquals(keyBytes, pgpKey.keyData);
+		assertTrue(Arrays.equals(keyBytes, pgpKey.keyData));
 	}
 
-	@Test(expected = CouldntRetrieveKeyException.class)
+	@Test
 	public void testRetrieveKey_gpgNonZeroExitCode() throws Exception {
-		final ExecutionResult result = new ExecutionResult(3, "didnt get key");
-		when(commandExecutor.execute(any(Commandline.class))).thenReturn(result);
-		gpgKeyRetriever.retrieveKey(keyId);
+		final Executable executable = () -> {
+			final ExecutionResult result = new ExecutionResult(3, "didnt get key");
+			when(commandExecutor.execute(any(Commandline.class))).thenReturn(result);
+			gpgKeyRetriever.retrieveKey(keyId);
+		};
+		assertThrows(CouldntRetrieveKeyException.class, executable);
 	}
 
-	@Test(expected = CouldntRetrieveKeyException.class)
+	@Test
 	public void testRetrieveKey_ioe() throws Exception {
-		final ExecutionResult result = new ExecutionResult(0, "got said key");
-		when(commandExecutor.execute(any(Commandline.class))).thenReturn(result);
-		PowerMockito.mockStatic(FileUtils.class);
-		PowerMockito.when(FileUtils.readFileToByteArray(any(File.class))).thenThrow(new IOException());
-		gpgKeyRetriever.retrieveKey(keyId);
+		final Executable executable = () -> {
+			gpgKeyRetriever.throwIoe = true;
+			gpgKeyRetriever.retrieveKey(keyId);
+		};
+		assertThrows(CouldntRetrieveKeyException.class, executable);
+	}
+
+	/**
+	 * Not proud of this. Need a better way.
+	 */
+	private static class TestGPGKeyRetriever extends GPGKeyRetriever {
+		private File file;
+		private boolean throwIoe = false;
+
+		@Override
+		public File createTempFile(final String keyId) throws IOException {
+			if (throwIoe) {
+				throw new IOException();
+			} else {
+				file = super.createTempFile(keyId);
+				FileUtils.writeByteArrayToFile(file, keyBytes);
+				return file;
+			}
+		}
 	}
 }

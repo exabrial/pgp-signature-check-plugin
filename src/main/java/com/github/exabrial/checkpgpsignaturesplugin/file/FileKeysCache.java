@@ -25,7 +25,6 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.FileUtils;
@@ -34,6 +33,7 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.repository.RepositoryManager;
 import org.codehaus.plexus.logging.Logger;
 
+import com.github.exabrial.checkpgpsignaturesplugin.MojoProperties;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeysCache;
 import com.github.exabrial.checkpgpsignaturesplugin.model.PGPKey;
 
@@ -51,13 +51,12 @@ public class FileKeysCache implements KeysCache {
 	@Inject
 	private MavenSession mavenSession;
 	@Inject
-	@Named("${keyCacheDirectory}")
-	private Provider<String> keyCacheDirectory;
+	private MojoProperties mojoProperties;
 	private File keyCacheDirectoryFile;
 
 	@PostConstruct
 	public void postConstruct() {
-		if (keyCacheDirectory.get() == null) {
+		if ("~/.m2/artifactPubKeys".equals(mojoProperties.getProperty("keyCacheDirectory"))) {
 			logger.debug("postConstruct() using keycache default directory");
 			final ProjectBuildingRequest projectBuildingRequest = mavenSession.getProjectBuildingRequest();
 			final File repoDirectory = repositoryManager.getLocalRepositoryBasedir(projectBuildingRequest);
@@ -67,7 +66,7 @@ public class FileKeysCache implements KeysCache {
 				keyCacheDirectoryFile.mkdir();
 			}
 		} else {
-			keyCacheDirectoryFile = new File(keyCacheDirectory.get());
+			keyCacheDirectoryFile = new File(mojoProperties.getProperty("keyCacheDirectory"));
 			if (!keyCacheDirectoryFile.exists()) {
 				throw new UserSpecifiedKeyCacheDirectoryDoesntExistException(keyCacheDirectoryFile);
 			} else {

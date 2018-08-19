@@ -16,20 +16,28 @@
 
 package com.github.exabrial.checkpgpsignaturesplugin.model;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 public class PGPKeyTest {
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testPGPKey_nullid() {
-		new PGPKey(null, new byte[0]);
+		final Executable executable = () -> {
+			new PGPKey(null, new byte[0]);
+		};
+		assertThrows(IllegalArgumentException.class, executable);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testPGPKey_nullbytes() {
-		new PGPKey("keyid", null);
+		final Executable executable = () -> {
+			new PGPKey("keyid", null);
+		};
+		assertThrows(IllegalArgumentException.class, executable);
 	}
 
 	@Test

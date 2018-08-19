@@ -16,8 +16,9 @@
 
 package com.github.exabrial.checkpgpsignaturesplugin.gpg;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -27,22 +28,23 @@ import java.io.File;
 
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.cli.Commandline;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.github.exabrial.checkpgpsignaturesplugin.model.SignatureCheckFailedException;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class GPGSignatureCheckerTest {
 	@InjectMocks
 	private GPGSignatureChecker gpgSignatureChecker;
 	@Mock
 	private CommandExecutor commandExecutor;
 	@Mock
-	private GPGExecutable gpgExecutable;
+	private GPGLocator gpgExecutable;
 	@Mock
 	private Logger logger;
 
@@ -64,30 +66,36 @@ public class GPGSignatureCheckerTest {
 		verify(commandExecutor).execute(any(Commandline.class));
 	}
 
-	@Test(expected = SignatureCheckFailedException.class)
+	@Test
 	public void checkArtifact_failedSignature_badViaExitCode() throws Exception {
-		final String output = "	gpg: Signature made Mon Jul  2 10:40:59 2018 CDT\n"
-				+ "	gpg:                using ECDSA key 541CEDD95256E35AC71EAB263416E5421AB9AC60\n"
-				+ "	gpg: using subkey 3416E5421AB9AC60 instead of primary key 0306A354336B4F0D\n" + "	gpg: using pgp trust model\n"
-				+ "	gpg: BAD signature from \"Jonathan S. Fisher <exabrial@gmail.com>\" [unknown]\n"
-				+ "	gpg: binary signature, digest algorithm SHA384, key algorithm nistp384";
-		final String requiredKeyId = "871638A21A7F2C38066471420306A354336B4F0D";
-		final ExecutionResult result = new ExecutionResult(2, output);
-		when(commandExecutor.execute(any(Commandline.class))).thenReturn(result);
-		gpgSignatureChecker.checkArtifact(mock(File.class), mock(File.class), mock(File.class), requiredKeyId);
+		final Executable executable = () -> {
+			final String output = "	gpg: Signature made Mon Jul  2 10:40:59 2018 CDT\n"
+					+ "	gpg:                using ECDSA key 541CEDD95256E35AC71EAB263416E5421AB9AC60\n"
+					+ "	gpg: using subkey 3416E5421AB9AC60 instead of primary key 0306A354336B4F0D\n" + "	gpg: using pgp trust model\n"
+					+ "	gpg: BAD signature from \"Jonathan S. Fisher <exabrial@gmail.com>\" [unknown]\n"
+					+ "	gpg: binary signature, digest algorithm SHA384, key algorithm nistp384";
+			final String requiredKeyId = "871638A21A7F2C38066471420306A354336B4F0D";
+			final ExecutionResult result = new ExecutionResult(2, output);
+			when(commandExecutor.execute(any(Commandline.class))).thenReturn(result);
+			gpgSignatureChecker.checkArtifact(mock(File.class), mock(File.class), mock(File.class), requiredKeyId);
+		};
+		assertThrows(SignatureCheckFailedException.class, executable);
 	}
 
-	@Test(expected = SignatureCheckFailedException.class)
+	@Test
 	public void checkArtifact_failedSignature_badViaStdOut() throws Exception {
-		final String output = "	gpg: Signature made Mon Jul  2 10:40:59 2018 CDT\n"
-				+ "	gpg:                using ECDSA key 541CEDD95256E35AC71EAB263416E5421AB9AC60\n"
-				+ "	gpg: using subkey 3416E5421AB9AC60 instead of primary key 0306A354336B4F0D\n" + "	gpg: using pgp trust model\n"
-				+ "	gpg: BAD signature from \"Jonathan S. Fisher <exabrial@gmail.com>\" [unknown]\n"
-				+ "	gpg: binary signature, digest algorithm SHA384, key algorithm nistp384";
-		final String requiredKeyId = "871638A21A7F2C38066471420306A354336B4F0D";
-		final ExecutionResult result = new ExecutionResult(0, output);
-		when(commandExecutor.execute(any(Commandline.class))).thenReturn(result);
-		gpgSignatureChecker.checkArtifact(mock(File.class), mock(File.class), mock(File.class), requiredKeyId);
+		final Executable executable = () -> {
+			final String output = "	gpg: Signature made Mon Jul  2 10:40:59 2018 CDT\n"
+					+ "	gpg:                using ECDSA key 541CEDD95256E35AC71EAB263416E5421AB9AC60\n"
+					+ "	gpg: using subkey 3416E5421AB9AC60 instead of primary key 0306A354336B4F0D\n" + "	gpg: using pgp trust model\n"
+					+ "	gpg: BAD signature from \"Jonathan S. Fisher <exabrial@gmail.com>\" [unknown]\n"
+					+ "	gpg: binary signature, digest algorithm SHA384, key algorithm nistp384";
+			final String requiredKeyId = "871638A21A7F2C38066471420306A354336B4F0D";
+			final ExecutionResult result = new ExecutionResult(0, output);
+			when(commandExecutor.execute(any(Commandline.class))).thenReturn(result);
+			gpgSignatureChecker.checkArtifact(mock(File.class), mock(File.class), mock(File.class), requiredKeyId);
+		};
+		assertThrows(SignatureCheckFailedException.class, executable);
 	}
 
 	@Test

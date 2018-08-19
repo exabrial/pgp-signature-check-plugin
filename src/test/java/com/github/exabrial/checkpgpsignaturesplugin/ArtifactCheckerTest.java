@@ -16,6 +16,7 @@
 
 package com.github.exabrial.checkpgpsignaturesplugin;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -28,20 +29,19 @@ import java.io.IOException;
 
 import org.apache.maven.artifact.Artifact;
 import org.codehaus.plexus.logging.Logger;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeyIdResolver;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeyRetriever;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.KeysCache;
 import com.github.exabrial.checkpgpsignaturesplugin.interfaces.SignatureChecker;
-import com.github.exabrial.checkpgpsignaturesplugin.model.MissingKeyMappingException;
 import com.github.exabrial.checkpgpsignaturesplugin.model.PGPKey;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ArtifactCheckerTest {
 	@InjectMocks
 	private ArtifactChecker artifactChecker;
@@ -49,8 +49,6 @@ public class ArtifactCheckerTest {
 	private KeysCache pgpKeysCache;
 	@Mock
 	private KeyRetriever pgpKeyRetriever;
-	@Mock
-	private KeyIdResolver pgpKeyIdResolver;
 	@Mock
 	private SignatureChecker signatureChecker;
 	@Mock
@@ -63,10 +61,9 @@ public class ArtifactCheckerTest {
 
 	@Test
 	public void testCheck_cacheMiss() throws Exception {
-		when(pgpKeyIdResolver.resolveKeyIdFor(artifact)).thenReturn(keyId);
 		final PGPKey pgpKey = mock(PGPKey.class);
 		when(pgpKeyRetriever.retrieveKey(keyId)).thenReturn(pgpKey);
-		artifactChecker.check(artifact, signature);
+		artifactChecker.check(artifact, signature, keyId);
 		verify(pgpKeysCache).getKeyFile(keyId);
 		verify(pgpKeyRetriever).retrieveKey(keyId);
 		verify(pgpKeysCache).put(pgpKey);
@@ -74,25 +71,21 @@ public class ArtifactCheckerTest {
 
 	@Test
 	public void testCheck_cacheHit() throws Exception {
-		when(pgpKeyIdResolver.resolveKeyIdFor(artifact)).thenReturn(keyId);
 		when(pgpKeysCache.getKeyFile(keyId)).thenReturn(mock(File.class));
-		artifactChecker.check(artifact, signature);
+		artifactChecker.check(artifact, signature, keyId);
 		verify(pgpKeysCache).getKeyFile(keyId);
 		verify(pgpKeysCache, never()).put(any(PGPKey.class));
 		verifyZeroInteractions(pgpKeyRetriever);
 	}
 
-	@Test(expected = MissingKeyMappingException.class)
-	public void testCheck_noMappedKey() {
-		artifactChecker.check(artifact, signature);
-	}
-
-	@Test(expected = RuntimeException.class)
+	@Test
 	public void testCheck_ioeOnPut() throws Exception {
-		when(pgpKeyIdResolver.resolveKeyIdFor(artifact)).thenReturn(keyId);
-		final PGPKey pgpKey = mock(PGPKey.class);
-		when(pgpKeyRetriever.retrieveKey(keyId)).thenReturn(pgpKey);
-		when(pgpKeysCache.put(pgpKey)).thenThrow(new IOException());
-		artifactChecker.check(artifact, signature);
+		final Executable executable = () -> {
+			final PGPKey pgpKey = mock(PGPKey.class);
+			when(pgpKeyRetriever.retrieveKey(keyId)).thenReturn(pgpKey);
+			when(pgpKeysCache.put(pgpKey)).thenThrow(new IOException());
+			artifactChecker.check(artifact, signature, keyId);
+		};
+		assertThrows(RuntimeException.class, executable);
 	}
 }

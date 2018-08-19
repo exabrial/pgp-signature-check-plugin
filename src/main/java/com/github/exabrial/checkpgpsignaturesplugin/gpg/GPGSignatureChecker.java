@@ -41,7 +41,7 @@ public class GPGSignatureChecker implements SignatureChecker {
 	@Inject
 	private CommandExecutor commandExecutor;
 	@Inject
-	private GPGExecutable gpgExecutable;
+	private GPGLocator gpgLocator;
 	@Inject
 	private Logger logger;
 
@@ -51,7 +51,7 @@ public class GPGSignatureChecker implements SignatureChecker {
 		logger.debug("checkArtifact() artifactFile:" + artifactFile + ", signatureFile:" + signatureFile + ", keyRingFile:" + keyRingFile
 				+ ", keyId:" + keyId);
 		final Commandline cmd = new Commandline();
-		cmd.setExecutable(gpgExecutable.getGPGExecutable());
+		cmd.setExecutable(gpgLocator.getGPGExecutable());
 		cmd.createArg().setValue("--verbose");
 		cmd.createArg().setValue("--no-default-keyring");
 		cmd.createArg().setValue("--always-trust");
