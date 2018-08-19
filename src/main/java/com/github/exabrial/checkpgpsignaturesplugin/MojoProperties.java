@@ -44,32 +44,39 @@ public class MojoProperties {
 	private final Properties properties = new Properties();
 	private PluginParameterExpressionEvaluator evaluator;
 
-	@PostConstruct
-	private void postConstruct() {
-		evaluator = new PluginParameterExpressionEvaluator(session, execution);
-		properties.setProperty("gpgExecutable", getParameter("gpgExecutable"));
-		properties.setProperty("keyCacheDirectory", getParameter("keyCacheDirectory"));
-		properties.setProperty("keyMapFileName", getParameter("keyMapFileName"));
-		properties.setProperty("checkPomSignatures", String.valueOf(getParameter("checkPomSignatures")));
-	}
-
 	public String getProperty(final String key) {
 		return properties.getProperty(key);
 	}
 
-	private String getParameter(final String name) {
+	@PostConstruct
+	protected void postConstruct() {
+		evaluator = new PluginParameterExpressionEvaluator(session, execution);
+		setIfNotNull("gpgExecutable");
+		setIfNotNull("keyCacheDirectory");
+		setIfNotNull("keyMapFileName");
+		setIfNotNull("checkPomSignatures");
+	}
+
+	void setIfNotNull(final String parameterName) {
+		final String parameter = getParameter(parameterName);
+		if (parameter != null) {
+			properties.setProperty(parameterName, parameter);
+		}
+	}
+
+	private String getParameter(final String parameterName) {
 		final Xpp3Dom configuration = execution.getConfiguration();
-		final Xpp3Dom child = configuration.getChild(name);
+		final Xpp3Dom child = configuration.getChild(parameterName);
 		if (child != null) {
 			String value = child.getValue();
 			if (value == null) {
 				value = child.getAttribute("default-value");
-				if (value != null) {
-					try {
-						value = (String) evaluator.evaluate(value);
-					} catch (final ExpressionEvaluationException e) {
-						throw new RuntimeException(e);
-					}
+			}
+			if (value != null) {
+				try {
+					value = (String) evaluator.evaluate(value);
+				} catch (final ExpressionEvaluationException e) {
+					throw new RuntimeException(e);
 				}
 			}
 			return value;
