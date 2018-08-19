@@ -34,7 +34,7 @@
         <ul class="breadcrumb">
         <li id="publishDate">Last Published: 2018-08-19<span class="divider">|</span>
 </li>
-          <li id="projectVersion">Version: 1.0.2</li>
+          <li id="projectVersion">Version: 1.0.3</li>
         </ul>
       </div>
       <div class="row-fluid">
@@ -62,11 +62,12 @@
 <p>Maven plugin to automatically check PGP signatures of downloaded artifacts. This should be part of a multi-tier defense to prevent hostile code from being injected into your applications.</p>
 <div class="section">
 <h2><a name="Quick_Start"></a>Quick Start</h2>
-<p>Create an <tt>artifact-key-map.txt</tt> in your project root that pins artifacts to PGP keys. See the example <a href="../master/src/test/resources/artifact-key-map.txt">here</a>.</p>
+<p>Create an <tt>artifact-key-map.txt</tt> in your project root that pins artifacts to PGP keys. See the example <a class="externalLink" href="https://raw.githubusercontent.com/exabrial/pgp-signature-check-plugin/master/src/test/resources/artifact-key-map.txt">here</a>.</p>
 
 <div>
 <div>
 <pre class="source">org.bouncycastle:*:*=0x08F0AAB4D0C1A4BDDE340765B341DDB020FCB6AB
+com.skip.me:*:*=skip-signature-check
 </pre></div></div>
 
 <p>Next add this to your build section:</p>
@@ -80,7 +81,7 @@
     &lt;plugin&gt;
       &lt;groupId&gt;com.github.exabrial&lt;/groupId&gt;
       &lt;artifactId&gt;pgp-signature-check-plugin&lt;/artifactId&gt;
-      &lt;version&gt;${version.pgp-signature-check}&lt;/version&gt;
+      &lt;version&gt;${version.pgp-signature-check-plugin}&lt;/version&gt;
       &lt;executions&gt;
         &lt;execution&gt;
           &lt;id&gt;pgp-signature-check&lt;/id&gt;
@@ -96,9 +97,7 @@
 &lt;/build&gt;
 </pre></div></div>
 
-<p>For the value of <tt>${version.pgp-signature-check}</tt>, the latest release version is:</p>
-<p><a class="externalLink" href="https://maven-badges.herokuapp.com/maven-central/com.github.exabrial/pgp-signature-check-plugin"><img src="https://maven-badges.herokuapp.com/maven-central/com.github.exabrial/pgp-signature-check-plugin/badge.svg" alt="Maven Central" /></a></p>
-<p>Finally just run <tt>mvn pgp-signature-check:pgp-signature-check</tt> or your normal build process!</p></div>
+<p><tt>${version.pgp-signature-check-plugin}</tt> is listed at the top of this page. Finally just run <tt>mvn pgp-signature-check:pgp-signature-check</tt> or your normal build process!</p></div>
         </div>
       </div>
     </div>

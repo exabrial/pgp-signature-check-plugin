@@ -34,7 +34,7 @@
         <ul class="breadcrumb">
         <li id="publishDate">Last Published: 2018-08-19<span class="divider">|</span>
 </li>
-          <li id="projectVersion">Version: 1.0.2</li>
+          <li id="projectVersion">Version: 1.0.3</li>
         </ul>
       </div>
       <div class="row-fluid">
@@ -65,7 +65,7 @@
       
 <p><b>Full name</b>:</p>
       
-<p>com.github.exabrial:pgp-signature-check-plugin:1.0.2:pgp-signature-check</p>
+<p>com.github.exabrial:pgp-signature-check-plugin:1.0.3:pgp-signature-check</p>
       
 <p><b>Description</b>:</p>
       
@@ -156,7 +156,11 @@ So for bouncycastle, that'd look like:
 <p>
 org.bouncycastle:*:*=0x08F0AAB4D0C1A4BDDE340765B341DDB020FCB6AB</p>
 Wildcards are allowed. All lines are trimmed. Comments begin the #
-[hash] character.<br /><b>Default value is</b>: <tt>${project.basedir}/artifact-key-map.txt</tt>.<br /></td>
+[hash] character. 
+
+<p>To skip a particular artifact, set the value to:
+`skip-signature-check`</p>
+groupId:artifactId:version=skip-signature-check<br /><b>Default value is</b>: <tt>${project.basedir}/artifact-key-map.txt</tt>.<br /></td>
           </tr>
         </table>
       </div>
@@ -224,7 +228,11 @@ So for bouncycastle, that'd look like:
 <p>
 org.bouncycastle:*:*=0x08F0AAB4D0C1A4BDDE340765B341DDB020FCB6AB</p>
 Wildcards are allowed. All lines are trimmed. Comments begin the #
-[hash] character.</div>
+[hash] character. 
+
+<p>To skip a particular artifact, set the value to:
+`skip-signature-check`</p>
+groupId:artifactId:version=skip-signature-check</div>
         
 <ul>
           
