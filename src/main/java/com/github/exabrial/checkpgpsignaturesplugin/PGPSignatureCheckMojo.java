@@ -113,7 +113,7 @@ public class PGPSignatureCheckMojo extends AbstractMojo {
 					}
 					artifactChecker.check(artifact, ascArtifact, keyId);
 				} else {
-					logger.warn("check() per user request, skipping signature check on artifact:" + artifact);
+					logger.warn("execute() per user request, skipping signature check on artifact:" + artifact);
 				}
 			});
 		} catch (final SignatureCheckFailedException e) {
