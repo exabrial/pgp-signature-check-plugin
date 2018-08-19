@@ -60,10 +60,8 @@ public class GPGLocator {
 		logger.info("postConstruct() using gpgExecutable:" + gpgExecutable);
 	}
 
-	/**
-	 * Static methods are the death of testing :(
-	 */
-	boolean isWindows() {
+	protected boolean isWindows() {
+		// :( Static methods are the death of testing
 		return Os.isFamily(Os.FAMILY_WINDOWS);
 	}
 

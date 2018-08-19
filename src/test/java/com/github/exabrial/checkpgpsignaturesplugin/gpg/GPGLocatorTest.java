@@ -19,6 +19,7 @@ package com.github.exabrial.checkpgpsignaturesplugin.gpg;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
@@ -37,7 +38,7 @@ import com.github.exabrial.checkpgpsignaturesplugin.model.CantFindGPGException;
 @ExtendWith(MockitoExtension.class)
 public class GPGLocatorTest {
 	@InjectMocks
-	private TestGPGLocator gpgLocator;
+	private GPGLocator gpgLocator;
 	@Mock
 	private MojoProperties mojoProperties;
 	@Mock
@@ -56,10 +57,11 @@ public class GPGLocatorTest {
 
 	@Test
 	public void testPostConstruct_windows() {
+		final GPGLocator gpgLocator = spy(this.gpgLocator);
+		when(gpgLocator.isWindows()).thenReturn(Boolean.TRUE);
 		final String whichCommandOutput = "woot3";
 		final ExecutionResult result = new ExecutionResult(0, whichCommandOutput);
 		when(commandExecutor.execute(any(Commandline.class))).thenReturn(result);
-		gpgLocator.windows = false;
 		gpgLocator.postConstruct();
 		assertEquals(whichCommandOutput, gpgLocator.getGPGExecutable());
 	}
@@ -82,21 +84,5 @@ public class GPGLocatorTest {
 			gpgLocator.postConstruct();
 		};
 		assertThrows(CantFindGPGException.class, executable);
-	}
-
-	/**
-	 * Not proud of testing this way. Static methods are hell.
-	 */
-	private static class TestGPGLocator extends GPGLocator {
-		private Boolean windows;
-
-		@Override
-		boolean isWindows() {
-			if (windows == null) {
-				return super.isWindows();
-			} else {
-				return windows;
-			}
-		}
 	}
 }
