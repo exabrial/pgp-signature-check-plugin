@@ -7,7 +7,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.exabrial</groupId>
 	<artifactId>pgp-signature-check-plugin</artifactId>
-	<version>1.0.2</version>
+	<version>1.0.3-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 	<description>Automatically check PGP signatures on downloaded artifacts using GPG</description>
 	<name>pgp-signature-check-plugin</name>
@@ -16,7 +16,7 @@
 		<connection>scm:git:ssh://git@github.com/exabrial/pgp-signature-check-plugin.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/exabrial/pgp-signature-check-plugin.git</developerConnection>
 		<url>https://github.com/exabrial/pgp-signature-check-plugin/tree/master</url>
-	  <tag>pgp-signature-check-plugin-1.0.2</tag>
+	  <tag>HEAD</tag>
   </scm>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
