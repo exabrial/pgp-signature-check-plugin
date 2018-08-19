@@ -34,16 +34,17 @@ You'll need Java8, a `~/.m2/toolchains.xml`[file](../master/support-files/toolch
 
 #### site
 
-* `mvn clean install -P site`
+* `mvn clean site -P site`
 * Reports on all static analysis. Handy to see unit test coverage
 
 #### gh-pages
 
 * `git checkout pgp-signature-check-plugin-1.0.X`
-* `mvn clean install -P gh-pages`
+* `mvn clean site -P gh-pages`
 * Builds the public facing website. Override the sysprop:
-  * `mvn clean install -P gh-pages -Dgithub.site.skip=false` to actually deploy. You must have a server setup in `settings.xml` to do this of course.
+  * `mvn clean site -P gh-pages -Dgithub.site.skip=false` to actually deploy. You must have a server setup in `settings.xml` to do this of course.
 
 #### eclipse
 
-* Adds the eclipse junit5 provider to the classpath
+* Adds the junit5 provider to the classpath
+* Set this as the default profile inside Eclipse or your IDE
