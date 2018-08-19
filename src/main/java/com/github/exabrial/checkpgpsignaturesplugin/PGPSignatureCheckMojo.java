@@ -58,8 +58,6 @@ public class PGPSignatureCheckMojo extends AbstractMojo {
 	private KeyIdResolver pgpKeyIdResolver;
 	@Inject
 	private Logger logger;
-	@Inject
-	private MojoProperties mojoProperties;
 	/**
 	 * The fully qualified path to the gpg executable. If not specified, the plugin
 	 * will perform a which/where.exe lookup
@@ -96,10 +94,6 @@ public class PGPSignatureCheckMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		mojoProperties.setProperty("gpgExecutable", gpgExecutable);
-		mojoProperties.setProperty("keyCacheDirectory", keyCacheDirectory);
-		mojoProperties.setProperty("keyMapFileName", keyMapFileName);
-		mojoProperties.setProperty("checkPomSignatures", String.valueOf(checkPomSignatures));
 		logger.info("execute() checking artifact PGP signatures...");
 		try {
 			final Set<Artifact> filtered = dependenciesLocator.getArtifactsToVerify();
