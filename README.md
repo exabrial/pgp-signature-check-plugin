@@ -23,6 +23,11 @@ You'll need Java8, a `~/.m2/toolchains.xml`[file](../master/support-files/toolch
 
 ### Profiles
 
+#### sign
+* `mvn clean install -P sign`
+* Signs the artifacts in the build. Required for release:
+  * `mvn clean release:prepare release:perform -P sign`
+
 #### skipChecks
 * `mvn clean install -P skipChecks`
 * Skips all static analysis, runs unit tests
@@ -34,8 +39,10 @@ You'll need Java8, a `~/.m2/toolchains.xml`[file](../master/support-files/toolch
 
 #### gh-pages
 
+* `git checkout pgp-signature-check-plugin-1.0.X`
 * `mvn clean install -P gh-pages`
-* Builds the public facing website. Override the sysprop: * `mvn clean install -P gh-pages -Dgithub.site.skip=false` to actually deploy. You must have a server setup in `settings.xml` to do this of course.
+* Builds the public facing website. Override the sysprop:
+  * `mvn clean install -P gh-pages -Dgithub.site.skip=false` to actually deploy. You must have a server setup in `settings.xml` to do this of course.
 
 #### eclipse
 
